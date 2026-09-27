@@ -1,0 +1,1405 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BUS AMAN: Budaya Sekolah Aman dan Nyaman</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden;
+            touch-action: manipulation;
+            user-select: none;
+            background: url('https://i.imgur.com/K0kXZ2y.png') no-repeat center center fixed;
+            background-size: cover;
+        }
+        
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            border-radius: 24px;
+        }
+
+        .glass-header {
+            background: transparent;
+            border-bottom: none;
+            box-shadow: none;
+            padding-top: 1rem;
+        }
+
+        .btn-header {
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            color: #1e293b;
+            transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .btn-header:hover {
+            background: rgba(255, 255, 255, 0.6);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .btn-header:active { transform: translateY(0); }
+
+        .font-display { font-family: 'Fredoka One', cursive; }
+        
+        .btn-game { 
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); 
+            box-shadow: 0 6px 0 rgba(0,0,0,0.25); 
+        }
+        .btn-game:active { 
+            transform: translateY(4px); 
+            box-shadow: 0 2px 0 rgba(0,0,0,0.2); 
+        }
+        
+        .btn-gradient-blue {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            border: 2px solid rgba(255,255,255,0.4);
+        }
+        
+        .avatar-card.selected { 
+            border-color: #4ade80; 
+            background: rgba(220, 252, 231, 0.9);
+            transform: scale(1.1); 
+            box-shadow: 0 0 20px rgba(74, 222, 128, 0.5);
+        }
+        
+        .avatar-card.taken {
+            opacity: 0.5;
+            filter: grayscale(100%);
+            cursor: not-allowed;
+            pointer-events: none;
+            border-color: #94a3b8;
+            position: relative;
+        }
+        .avatar-card.taken::after {
+            content: 'Dipilih';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        @keyframes bounce-in { 0% { transform: scale(0.8); opacity: 0; } 60% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); } }
+        .animate-pop { animation: bounce-in 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); }
+        
+        .crown-icon { animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.4); }
+
+        .text-stroke-black { 
+            -webkit-text-stroke: 1.5px black;
+            text-shadow: 3px 3px 0px rgba(0,0,0,0.3);
+        }
+        
+        /* Map specific classes */
+        .btn-map-active { animation: pulse-ring 2s infinite; }
+        @keyframes pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7); } 70% { box-shadow: 0 0 0 20px rgba(74, 222, 128, 0); } 100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); } }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col items-center justify-center p-0 md:p-4 bg-black/20">
+
+    <!-- AUDIO PLAYER -->
+    <audio id="bgm" loop>
+        <source src="https://github.com/belajarituseru39-gif/bus-aman/raw/refs/heads/main/BUS%20AMAN%20Ceria.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- GAME CONTAINER -->
+    <div id="game-container" class="relative w-full max-w-7xl h-full md:h-[95vh] glass-panel md:rounded-3xl overflow-hidden flex flex-col transition-all duration-300">
+        
+        <header class="glass-header p-3 md:p-4 flex justify-between items-center z-50 relative shrink-0">
+            <!-- Left: Navigation -->
+            <div class="flex items-center gap-2 md:gap-4">
+                <button onclick="switchScreen('map')" id="btn-map-nav" class="hidden btn-header p-2 rounded-full">
+                    <i data-lucide="map" class="w-5 h-5 md:w-6 md:h-6"></i>
+                </button>
+                <div class="btn-header p-2 rounded-full hidden md:block">
+                    <i data-lucide="bus" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h1 class="font-display text-xl md:text-2xl text-slate-800 tracking-wide hidden sm:block drop-shadow-sm text-stroke-white" style="-webkit-text-stroke: 1px white;">BUS AMAN</h1>
+                    <div class="text-[10px] md:text-xs font-bold text-slate-700 uppercase tracking-wider bg-white/40 px-2 rounded backdrop-blur-sm" id="current-stage-text">Intro</div>
+                </div>
+            </div>
+
+            <!-- Center: Active Player Indicator -->
+            <div id="player-info" class="hidden absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center gap-2 md:gap-3 glass-card px-4 py-2 !border-white/60 shadow-lg animate-pop z-50">
+                <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-slate-200 overflow-hidden border-2 border-white relative shadow-sm">
+                    <img id="header-avatar" src="" class="w-full h-full object-cover object-top absolute inset-0">
+                </div>
+                <div class="flex flex-col leading-none text-left">
+                    <span class="text-[8px] md:text-[10px] font-bold text-slate-500 uppercase tracking-wider">Giliran</span>
+                    <span id="header-name" class="font-display text-sm md:text-lg text-indigo-700 whitespace-nowrap max-w-[80px] md:max-w-[100px] truncate">Player</span>
+                </div>
+                <div class="h-6 md:h-8 w-px bg-slate-300 mx-1"></div>
+                <div class="flex items-center gap-1">
+                   <i data-lucide="star" class="w-4 h-4 md:w-5 md:h-5 text-yellow-500 fill-yellow-500 drop-shadow-sm"></i>
+                   <span id="score-display" class="font-display text-lg md:text-xl text-slate-800">0</span>
+                </div>
+                <div class="ml-2 bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs font-bold border border-blue-200" id="turn-counter-badge">1/3</div>
+            </div>
+
+            <!-- Right: Menu, Audio & Fullscreen -->
+            <div class="flex items-center gap-2 md:gap-3">
+                <button onclick="toggleAudio()" id="btn-audio" class="btn-header p-2 rounded-xl">
+                    <i data-lucide="music" class="w-5 h-5 md:w-6 md:h-6"></i>
+                </button>
+                <button onclick="toggleFullscreen()" class="btn-header p-2 rounded-xl hidden md:block">
+                    <i data-lucide="maximize" class="w-5 h-5 md:w-6 md:h-6"></i>
+                </button>
+                <button onclick="toggleScoreboard()" class="btn-header p-2 rounded-xl relative">
+                    <i data-lucide="trophy" class="w-5 h-5 md:w-6 md:h-6"></i>
+                    <span id="score-badge" class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold px-1.5 rounded-full hidden shadow-sm">!</span>
+                </button>
+                <button onclick="toggleMenu()" class="btn-header p-2 rounded-xl bg-yellow-400/80 hover:bg-yellow-400 border-yellow-200 text-slate-900">
+                    <i data-lucide="menu" class="w-5 h-5 md:w-6 md:h-6"></i>
+                </button>
+            </div>
+        </header>
+
+        <div id="scoreboard-widget" class="absolute top-20 right-4 z-40 glass-card w-64 overflow-hidden hidden transition-all duration-300 origin-top-right">
+            <div class="bg-slate-100/80 p-3 border-b border-slate-200 flex justify-between items-center">
+                <h3 class="font-bold text-slate-700 flex items-center gap-2"><i data-lucide="list-ordered" class="w-4 h-4"></i> Klasemen</h3>
+                <button onclick="toggleScoreboard()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            <div id="scoreboard-list" class="max-h-64 overflow-y-auto p-2 space-y-1"></div>
+        </div>
+
+        <main id="main-content" class="flex-1 relative overflow-hidden">
+            
+            <!-- SCENE 0: INTRO -->
+            <div id="scene-intro" class="scene absolute inset-0 flex flex-col items-center justify-center animate-pop overflow-y-auto p-4 custom-scroll">
+                <div class="text-center mt-4 md:mt-8 mb-8 drop-shadow-2xl flex flex-col items-center">
+                    <img src="https://i.imgur.com/v5Wj90U.png" class="w-32 h-32 md:w-48 md:h-48 object-contain mb-4 animate-bounce drop-shadow-lg" alt="Logo Bus Aman">
+                    
+                    <h1 class="font-display text-6xl md:text-8xl text-white mb-6 drop-shadow-[0_6px_6px_rgba(0,0,0,0.6)] tracking-wide text-stroke-black">BUS AMAN</h1>
+                    
+                    <div class="inline-block bg-yellow-400/90 text-slate-900 font-bold px-6 py-3 rounded-2xl shadow-xl border-4 border-white/60 backdrop-blur-md max-w-4xl text-sm md:text-lg leading-relaxed text-center mx-4">
+                        Sekolah adalah tempat untuk belajar, bermain, berteman, dan tumbuh bersama.<br class="hidden md:block">
+                        <span class="text-indigo-800">Di sekolah, aku aman, nyaman, dihargai, dan ikut menjaga.</span>
+                    </div>
+                </div>
+                
+                <div class="w-full max-w-4xl flex flex-col items-center mb-8">
+                    <div class="flex flex-col sm:flex-row gap-6 justify-center w-full mb-12">
+                        <button onclick="showMateri()" class="btn-game bg-white text-indigo-700 border-4 border-indigo-100 font-display text-xl md:text-2xl py-4 px-10 rounded-full shadow-2xl hover:bg-indigo-50 transition-transform hover:scale-105 flex items-center justify-center gap-3 w-full sm:w-auto">
+                            <i data-lucide="book-open" class="w-8 h-8 text-indigo-500"></i> RANGKUMAN
+                        </button>
+                        <button onclick="goToDifficulty()" class="btn-game btn-gradient-blue text-white font-display text-2xl md:text-3xl py-4 px-16 rounded-full shadow-2xl hover:brightness-110 animate-pulse border-b-8 border-blue-800 active:border-b-0 active:translate-y-2 flex items-center justify-center gap-3 w-full sm:w-auto">
+                            <i data-lucide="play-circle" class="w-8 h-8 fill-white/20"></i> MULAI!
+                        </button>
+                    </div>
+
+                    <div class="bg-white/90 px-6 py-2 rounded-full backdrop-blur-md shadow-lg border-2 border-white/60 flex flex-col md:flex-row items-center gap-2 md:gap-6 mt-auto">
+                        <div class="text-center md:text-left">
+                            <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Ide Permainan:</p>
+                            <p class="text-sm font-bold text-slate-800">Abdul Rahmat, S.Pd <span class="font-normal text-slate-600 hidden sm:inline">| SDN 011 Balikpapan Tengah</span></p>
+                            <p class="text-xs text-slate-600 sm:hidden">SDN 011 Balikpapan Tengah</p>
+                        </div>
+                        <div class="hidden md:block h-8 w-px bg-slate-300"></div>
+                        <div class="flex items-center gap-2 bg-green-100 px-3 py-1 rounded-full border border-green-200">
+                            <i data-lucide="phone" class="w-3 h-3 text-green-600"></i>
+                            <span class="text-xs font-bold text-green-700">081351767574</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SCENE 0.0: DIFFICULTY (Pecah Kelas 1-6) -->
+            <div id="scene-difficulty" class="scene hidden absolute inset-0 flex flex-col items-center justify-center p-4 overflow-y-auto">
+                <div class="glass-card p-6 md:p-10 max-w-4xl w-full text-center animate-slide relative border-4 border-indigo-300">
+                    <button onclick="switchScreen('intro')" class="absolute top-4 left-4 text-slate-400 hover:text-slate-600 bg-white/50 p-2 rounded-full hover:bg-white transition"><i data-lucide="arrow-left" class="w-8 h-8"></i></button>
+                    <h2 class="text-3xl md:text-4xl font-bold text-slate-800 mb-2 font-display">Pilih Kelasmu</h2>
+                    <p class="text-sm md:text-lg text-slate-600 mb-6 font-medium">Tantangan akan disesuaikan dengan tingkat kelasmu!</p>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
+                        <button onclick="selectDifficulty('kelas1')" class="btn-game bg-green-50 border-4 border-green-300 hover:border-green-500 p-4 rounded-3xl flex flex-col items-center transition-all hover:scale-105">
+                            <span class="font-display text-3xl md:text-4xl text-green-600 mb-1">1</span>
+                            <span class="font-bold text-green-800">Kelas 1</span>
+                        </button>
+                        <button onclick="selectDifficulty('kelas2')" class="btn-game bg-teal-50 border-4 border-teal-300 hover:border-teal-500 p-4 rounded-3xl flex flex-col items-center transition-all hover:scale-105">
+                            <span class="font-display text-3xl md:text-4xl text-teal-600 mb-1">2</span>
+                            <span class="font-bold text-teal-800">Kelas 2</span>
+                        </button>
+                        <button onclick="selectDifficulty('kelas3')" class="btn-game bg-blue-50 border-4 border-blue-300 hover:border-blue-500 p-4 rounded-3xl flex flex-col items-center transition-all hover:scale-105">
+                            <span class="font-display text-3xl md:text-4xl text-blue-600 mb-1">3</span>
+                            <span class="font-bold text-blue-800">Kelas 3</span>
+                        </button>
+                        <button onclick="selectDifficulty('kelas4')" class="btn-game bg-indigo-50 border-4 border-indigo-300 hover:border-indigo-500 p-4 rounded-3xl flex flex-col items-center transition-all hover:scale-105">
+                            <span class="font-display text-3xl md:text-4xl text-indigo-600 mb-1">4</span>
+                            <span class="font-bold text-indigo-800">Kelas 4</span>
+                        </button>
+                        <button onclick="selectDifficulty('kelas5')" class="btn-game bg-purple-50 border-4 border-purple-300 hover:border-purple-500 p-4 rounded-3xl flex flex-col items-center transition-all hover:scale-105">
+                            <span class="font-display text-3xl md:text-4xl text-purple-600 mb-1">5</span>
+                            <span class="font-bold text-purple-800">Kelas 5</span>
+                        </button>
+                        <button onclick="selectDifficulty('kelas6')" class="btn-game bg-pink-50 border-4 border-pink-300 hover:border-pink-500 p-4 rounded-3xl flex flex-col items-center transition-all hover:scale-105">
+                            <span class="font-display text-3xl md:text-4xl text-pink-600 mb-1">6</span>
+                            <span class="font-bold text-pink-800">Kelas 6</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SCENE 0.1: PLAYER COUNT -->
+            <div id="scene-player-count" class="scene hidden absolute inset-0 flex flex-col items-center justify-center p-8">
+                <div class="glass-card p-10 max-w-4xl w-full text-center animate-slide relative">
+                    <button onclick="switchScreen('difficulty')" class="absolute top-4 left-4 text-slate-400 hover:text-slate-600 bg-white/50 p-2 rounded-full hover:bg-white transition"><i data-lucide="arrow-left" class="w-8 h-8"></i></button>
+                    <h2 class="text-3xl md:text-4xl font-bold text-slate-800 mb-8 font-display">Pilih Jumlah Pemain</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                        <button onclick="selectPlayerCount(1)" class="btn-game bg-blue-50 border-4 border-blue-200 hover:border-blue-500 p-6 rounded-2xl flex flex-col items-center transition-all hover:scale-105 hover:-translate-y-2">
+                            <i data-lucide="user" class="w-12 h-12 md:w-16 md:h-16 text-blue-500 mb-2"></i>
+                            <span class="font-display text-xl md:text-2xl text-slate-700">1 Pemain</span>
+                        </button>
+                        <button onclick="selectPlayerCount(2)" class="btn-game bg-green-50 border-4 border-green-200 hover:border-green-500 p-6 rounded-2xl flex flex-col items-center transition-all hover:scale-105 hover:-translate-y-2">
+                            <div class="flex gap-1"><i data-lucide="user" class="w-10 h-10 text-green-500 mb-2"></i><i data-lucide="user" class="w-10 h-10 text-green-500 mb-2"></i></div>
+                            <span class="font-display text-xl md:text-2xl text-slate-700">2 Pemain</span>
+                        </button>
+                        <button onclick="selectPlayerCount(3)" class="btn-game bg-orange-50 border-4 border-orange-200 hover:border-orange-500 p-6 rounded-2xl flex flex-col items-center transition-all hover:scale-105 hover:-translate-y-2">
+                            <div class="flex gap-1 mb-2">
+                                <i data-lucide="user" class="w-8 h-8 text-orange-500"></i><i data-lucide="user" class="w-8 h-8 text-orange-500"></i><i data-lucide="user" class="w-8 h-8 text-orange-500"></i>
+                            </div>
+                            <span class="font-display text-xl md:text-2xl text-slate-700">3 Pemain</span>
+                        </button>
+                        <button onclick="selectPlayerCount(4)" class="btn-game bg-purple-50 border-4 border-purple-200 hover:border-purple-500 p-6 rounded-2xl flex flex-col items-center transition-all hover:scale-105 hover:-translate-y-2">
+                            <div class="grid grid-cols-2 gap-1 mb-2">
+                                <i data-lucide="user" class="w-8 h-8 text-purple-500"></i><i data-lucide="user" class="w-8 h-8 text-purple-500"></i>
+                                <i data-lucide="user" class="w-8 h-8 text-purple-500"></i><i data-lucide="user" class="w-8 h-8 text-purple-500"></i>
+                            </div>
+                            <span class="font-display text-xl md:text-2xl text-slate-700">4 Pemain</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SCENE 0.2: CHARACTER SELECTION -->
+            <div id="scene-char-select" class="scene hidden absolute inset-0 flex flex-col items-center justify-center p-4 md:p-8">
+                <div class="glass-card p-6 md:p-8 max-w-5xl w-full animate-slide flex flex-col h-full md:h-auto">
+                    <div class="text-center mb-4 md:mb-6">
+                        <div class="inline-block bg-indigo-100/80 text-indigo-700 px-4 py-1 rounded-full font-bold text-sm mb-2 uppercase tracking-wide backdrop-blur-sm">Persiapan</div>
+                        <h2 id="char-select-title" class="text-2xl md:text-3xl font-bold text-slate-800">Pemain 1: Pilih Karaktermu</h2>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 md:gap-4 mb-8 overflow-y-auto custom-scroll" id="avatar-grid"></div>
+                    <div class="mt-auto text-center text-slate-500 text-sm italic bg-white/50 py-2 rounded-xl">Klik pada karakter untuk memilih</div>
+                </div>
+            </div>
+
+            <!-- SCENE MAP -->
+            <div id="scene-map" class="scene hidden absolute inset-0 flex flex-col items-center justify-center p-4">
+                <h2 class="font-display text-2xl md:text-4xl text-slate-800 mb-4 glass-card px-8 py-3 rounded-full shadow-lg flex items-center gap-3">
+                    <i data-lucide="map" class="text-green-600 w-8 h-8"></i> PETA PERJALANAN
+                </h2>
+                <div class="relative w-full max-w-5xl aspect-[16/9] glass-card overflow-hidden !p-0 shadow-2xl !border-4 !border-white">
+                    <img src="https://i.imgur.com/wccdXgI.png" alt="Peta" class="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity duration-500">
+                    
+                    <!-- HALTE 1 -->
+                    <button id="btn-map-1" onclick="enterLevel(1)" disabled class="absolute top-[60%] left-[10%] -translate-y-1/2 group transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:grayscale">
+                        <div class="relative"><div class="w-14 h-14 md:w-20 md:h-20 bg-red-500 border-4 border-white rounded-full flex flex-col items-center justify-center shadow-xl z-10 relative"><span class="font-display text-xl md:text-2xl text-white">1</span></div><div class="absolute -bottom-6 md:-bottom-8 left-1/2 -translate-x-1/2 bg-white px-2 py-1 md:px-3 md:py-1 rounded-lg border-2 border-red-500 whitespace-nowrap shadow-md z-20"><span id="map-label-1" class="font-bold text-slate-700 text-[10px] md:text-xs">Menghargai</span></div><div id="bus-pos-1" class="hidden absolute -top-10 md:-top-14 left-1/2 -translate-x-1/2 animate-bounce z-30"><i data-lucide="bus" class="w-10 h-10 md:w-14 md:h-14 text-yellow-500 fill-yellow-400 drop-shadow-lg"></i></div></div>
+                    </button>
+                    <!-- HALTE 2 -->
+                    <button id="btn-map-2" onclick="enterLevel(2)" disabled class="absolute top-[30%] left-[28%] -translate-y-1/2 group transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:grayscale">
+                        <div class="relative"><div class="w-14 h-14 md:w-20 md:h-20 bg-blue-500 border-4 border-white rounded-full flex flex-col items-center justify-center shadow-xl z-10 relative"><span class="font-display text-xl md:text-2xl text-white">2</span></div><div class="absolute -bottom-6 md:-bottom-8 left-1/2 -translate-x-1/2 bg-white px-2 py-1 md:px-3 md:py-1 rounded-lg border-2 border-blue-500 whitespace-nowrap shadow-md z-20"><span id="map-label-2" class="font-bold text-slate-700 text-[10px] md:text-xs">Aku Aman</span></div><div id="bus-pos-2" class="hidden absolute -top-10 md:-top-14 left-1/2 -translate-x-1/2 animate-bounce z-30"><i data-lucide="bus" class="w-10 h-10 md:w-14 md:h-14 text-yellow-500 fill-yellow-400 drop-shadow-lg"></i></div></div>
+                    </button>
+                    <!-- HALTE 3 -->
+                    <button id="btn-map-3" onclick="enterLevel(3)" disabled class="absolute top-[65%] left-[50%] -translate-y-1/2 group transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:grayscale">
+                        <div class="relative"><div class="w-14 h-14 md:w-20 md:h-20 bg-orange-500 border-4 border-white rounded-full flex flex-col items-center justify-center shadow-xl z-10 relative"><span class="font-display text-xl md:text-2xl text-white">3</span></div> <div class="absolute -bottom-6 md:-bottom-8 left-1/2 -translate-x-1/2 bg-white px-2 py-1 md:px-3 md:py-1 rounded-lg border-2 border-orange-500 whitespace-nowrap shadow-md z-20"><span id="map-label-3" class="font-bold text-slate-700 text-[10px] md:text-xs">Aku Peduli</span></div><div id="bus-pos-3" class="hidden absolute -top-10 md:-top-14 left-1/2 -translate-x-1/2 animate-bounce z-30"><i data-lucide="bus" class="w-10 h-10 md:w-14 md:h-14 text-yellow-500 fill-yellow-400 drop-shadow-lg"></i></div></div>
+                    </button>
+                    <!-- HALTE 4 -->
+                    <button id="btn-map-4" onclick="enterLevel(4)" disabled class="absolute top-[35%] left-[70%] -translate-y-1/2 group transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:grayscale">
+                        <div class="relative"><div class="w-14 h-14 md:w-20 md:h-20 bg-purple-500 border-4 border-white rounded-full flex flex-col items-center justify-center shadow-xl z-10 relative"><span class="font-display text-xl md:text-2xl text-white">4</span></div><div class="absolute -bottom-6 md:-bottom-8 left-1/2 -translate-x-1/2 bg-white px-2 py-1 md:px-3 md:py-1 rounded-lg border-2 border-purple-500 whitespace-nowrap shadow-md z-20"><span id="map-label-4" class="font-bold text-slate-700 text-[10px] md:text-xs">Cerdas Digital</span></div><div id="bus-pos-4" class="hidden absolute -top-10 md:-top-14 left-1/2 -translate-x-1/2 animate-bounce z-30"><i data-lucide="bus" class="w-10 h-10 md:w-14 md:h-14 text-yellow-500 fill-yellow-400 drop-shadow-lg"></i></div></div>
+                    </button>
+                    <!-- HALTE 5 -->
+                    <button id="btn-map-5" onclick="enterLevel(5)" disabled class="absolute top-[55%] left-[88%] -translate-y-1/2 group transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:grayscale">
+                        <div class="relative"><div class="w-14 h-14 md:w-20 md:h-20 bg-green-500 border-4 border-white rounded-full flex flex-col items-center justify-center shadow-xl z-10 relative"><span class="font-display text-xl md:text-2xl text-white">5</span></div><div class="absolute -bottom-6 md:-bottom-8 left-1/2 -translate-x-1/2 bg-white px-2 py-1 md:px-3 md:py-1 rounded-lg border-2 border-green-500 whitespace-nowrap shadow-md z-20"><span id="map-label-5" class="font-bold text-slate-700 text-[10px] md:text-xs">Ikut Menjaga</span></div><div id="bus-pos-5" class="hidden absolute -top-10 md:-top-14 left-1/2 -translate-x-1/2 animate-bounce z-30"><i data-lucide="bus" class="w-10 h-10 md:w-14 md:h-14 text-yellow-500 fill-yellow-400 drop-shadow-lg"></i></div></div>
+                    </button>
+                </div>
+                <div class="mt-6 glass-card px-8 py-3 rounded-full text-yellow-900 font-bold animate-pulse text-center shadow-lg bg-yellow-100/90 border-yellow-200">
+                    <i data-lucide="info" class="inline w-5 h-5 mr-1 align-text-bottom"></i> 
+                    <span id="map-status-text">Klik tombol Halte yang ada bus-nya untuk masuk!</span>
+                </div>
+            </div>
+
+            <!-- SCENE 1: HALTE 1 (Menghargai / Asas) -->
+            <div id="scene-halte1" class="scene hidden absolute inset-0 flex flex-col p-6 md:p-8 overflow-y-auto">
+                <div class="flex-1 flex flex-col items-center justify-center max-w-5xl mx-auto w-full my-auto">
+                    <div class="w-full glass-card p-6 md:p-10 mb-8 animate-slide relative border-l-8 !border-l-blue-500">
+                        <span class="absolute -top-4 -left-4 bg-blue-500 text-white px-4 py-1 rounded-full font-bold shadow-md uppercase tracking-wider text-sm">Kasus</span>
+                        <p id="h1-question-text" class="text-xl md:text-3xl font-medium text-slate-800 leading-relaxed text-center"></p>
+                    </div>
+                    <div id="h1-step1" class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-8 w-full">
+                        <button onclick="handleH1Step1('S')" class="btn-game bg-green-100 border-4 border-green-500 p-6 md:p-8 rounded-3xl flex flex-col items-center hover:bg-green-200 transition-colors shadow-lg"><i data-lucide="check-circle" class="w-16 h-16 md:w-20 md:h-20 text-green-600 mb-4"></i><span class="text-2xl md:text-3xl font-bold text-green-800">SESUAI</span></button>
+                        <button onclick="handleH1Step1('TS')" class="btn-game bg-red-100 border-4 border-red-500 p-6 md:p-8 rounded-3xl flex flex-col items-center hover:bg-red-200 transition-colors shadow-lg"><i data-lucide="x-circle" class="w-16 h-16 md:w-20 md:h-20 text-red-600 mb-4"></i><span class="text-2xl md:text-3xl font-bold text-red-800">TIDAK SESUAI</span></button>
+                    </div>
+                    <div id="h1-step2" class="hidden w-full text-center">
+                        <h3 class="text-xl md:text-2xl font-bold text-slate-700 mb-6 bg-white/80 inline-block px-6 py-2 rounded-full glass-card">Pilih Asas Kebaikan yang Paling Tepat:</h3>
+                        <div id="h1-asas-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-4"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SCENE 2: HALTE 2 (Aman - Ruang) -->
+            <div id="scene-halte2" class="scene hidden absolute inset-0 flex flex-col p-6 overflow-y-auto">
+                <div class="flex-1 flex flex-col items-center justify-center max-w-6xl mx-auto w-full my-auto">
+                    <div id="h2-card-display" class="w-full max-w-2xl glass-card p-8 text-center min-h-[200px] flex items-center justify-center animate-pop z-20 mb-8 relative !border-4 !border-slate-300">
+                        <span class="absolute -top-4 -left-4 bg-orange-500 text-white px-4 py-1 rounded-full font-bold shadow-md uppercase tracking-wider text-sm">Cek Keamanan</span>
+                        <p id="h2-card-text" class="text-2xl md:text-3xl font-bold text-slate-800">Loading...</p>
+                    </div>
+                    <div id="h2-step1" class="w-full">
+                        <h3 class="text-xl md:text-2xl font-bold text-slate-600 text-center mb-6 bg-white/70 inline-block px-4 py-1 rounded-full backdrop-blur-sm">Langkah 1: Masuk ke Fokus BSAN Mana?</h3>
+                        <div id="h2-category-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-5xl mx-auto">
+                            <!-- Injected dynamically -->
+                        </div>
+                    </div>
+                    <div id="h2-step2" class="hidden w-full">
+                        <h3 class="text-xl md:text-2xl font-bold text-slate-600 text-center mb-6 bg-white/70 inline-block px-4 py-1 rounded-full backdrop-blur-sm">Langkah 2: Tentukan Keadaannya</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full max-w-4xl mx-auto">
+                            <button onclick="handleH2Safety('A')" class="btn-game bg-green-100 border-4 border-green-500 p-6 md:p-8 rounded-3xl flex flex-col items-center hover:bg-green-200"><i data-lucide="shield-check" class="w-16 h-16 md:w-20 md:h-20 text-green-600 mb-4"></i><span class="text-2xl md:text-3xl font-bold text-green-800">AMAN</span></button>
+                            <button onclick="handleH2Safety('TA')" class="btn-game bg-red-100 border-4 border-red-500 p-6 md:p-8 rounded-3xl flex flex-col items-center hover:bg-red-200"><i data-lucide="alert-triangle" class="w-16 h-16 md:w-20 md:h-20 text-red-600 mb-4"></i><span class="text-2xl md:text-3xl font-bold text-red-800">TIDAK AMAN</span></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SCENE 3: HALTE 3 (Peduli - 3 Langkah) -->
+            <div id="scene-halte3" class="scene hidden absolute inset-0 flex flex-col p-6 md:p-8 overflow-y-auto">
+                <div id="h3-role-select" class="flex flex-col items-center justify-center min-h-full">
+                    <h2 class="text-2xl md:text-3xl font-bold text-slate-700 mb-8 text-center bg-white/80 glass-card px-8 py-3">Pilih Aksi Kebaikanmu:</h2>
+                    <div id="h3-role-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 w-full max-w-5xl">
+                        <!-- Injected dynamically -->
+                    </div>
+                </div>
+                <div id="h3-gameplay" class="hidden min-h-full flex flex-col items-center justify-center">
+                    <div class="bg-blue-100 border-2 border-blue-400 rounded-xl p-3 mb-4 w-full max-w-4xl text-center shadow-sm">
+                        <span class="font-bold text-blue-800 text-sm md:text-base">Ingat 3 Langkah Cepat: 🛑 BERHENTI - 🚶 MENJAUH - 🗣️ CERITA</span>
+                    </div>
+                    <div class="w-full max-w-4xl glass-card p-6 md:p-8 mb-8 relative border-l-8 !border-l-red-500">
+                        <div class="absolute -top-3 -right-3 bg-red-100 text-red-600 px-3 py-1 rounded-full text-xs font-bold border border-red-200" id="h3-counter">1/1</div>
+                        <h3 class="text-red-500 font-bold mb-2 flex items-center gap-2 uppercase tracking-wide"><i data-lucide="alert-circle"></i> Saat Kamu Melihat/Mengalami:</h3>
+                        <p id="h3-problem-text" class="text-xl md:text-2xl font-medium text-slate-800 leading-relaxed"></p>
+                    </div>
+                    <h4 class="text-lg md:text-xl font-bold text-slate-600 mb-4 bg-orange-100/90 px-6 py-2 rounded-full shadow-md backdrop-blur-sm">Pilih aksi <span id="h3-role-badge" class="text-orange-600"></span> yang paling aman:</h4>
+                    <div id="h3-options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-5xl"></div>
+                </div>
+            </div>
+
+            <!-- SCENE 4: HALTE 4 (Cerdas Digital - T.H.I.N.K) -->
+            <div id="scene-halte4" class="scene hidden absolute inset-0 flex flex-col items-center justify-center p-4 overflow-y-auto">
+                <h2 class="text-2xl md:text-4xl font-bold text-slate-800 mb-6 bg-white/80 glass-card px-8 py-2 font-display flex items-center gap-2">
+                    <i data-lucide="smartphone" class="w-8 h-8 text-purple-600"></i> Cerdas Digital
+                </h2>
+                
+                <div class="glass-card max-w-md w-full !rounded-[3rem] border-8 border-slate-800 shadow-2xl relative bg-white/95 overflow-hidden">
+                    <!-- Top Phone Bar -->
+                    <div class="bg-slate-800 h-6 w-full flex justify-center items-center rounded-b-xl mb-4"><div class="w-20 h-2 bg-black rounded-full"></div></div>
+                    
+                    <div class="p-6 text-center min-h-[220px] flex flex-col justify-center bg-slate-50 border-y border-slate-200 mx-2 rounded-2xl mb-4 shadow-inner">
+                        <p id="h4-digital-text" class="text-xl md:text-2xl font-medium text-slate-800 leading-relaxed"></p>
+                    </div>
+                    
+                    <div class="px-4 pb-6 flex flex-col gap-3">
+                        <button onclick="handleDigitalAction('AMAN')" class="btn-game bg-green-500 text-white font-bold text-xl py-4 rounded-2xl hover:bg-green-600 flex items-center justify-center gap-2 border-b-4 border-green-700 active:border-b-0 active:translate-y-1">
+                            <i data-lucide="check-circle" class="w-6 h-6"></i> AMAN DILAKUKAN
+                        </button>
+                        <button onclick="handleDigitalAction('BAHAYA')" class="btn-game bg-red-500 text-white font-bold text-xl py-4 rounded-2xl hover:bg-red-600 flex items-center justify-center gap-2 border-b-4 border-red-700 active:border-b-0 active:translate-y-1">
+                            <i data-lucide="alert-octagon" class="w-6 h-6"></i> BAHAYA! JANGAN!
+                        </button>
+                    </div>
+                </div>
+                <div class="mt-6 text-purple-900 font-bold animate-pulse text-center bg-purple-100/90 px-6 py-2 rounded-full border border-purple-300 shadow-sm max-w-lg">
+                    Ingat prinsip T.H.I.N.K (Tepat, Hormat, Info Benar, Nyaman, Ku beri izin)!
+                </div>
+            </div>
+
+            <!-- SCENE 5: HALTE 5 (Ikut Menjaga / Collection) -->
+            <div id="scene-halte5" class="scene hidden absolute inset-0 flex flex-col p-4 md:p-6 overflow-y-auto">
+                <div class="w-full max-w-5xl mx-auto glass-card p-6 mb-6 relative border-t-8 !border-t-green-500">
+                    <span class="absolute top-4 right-4 bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold shadow-sm">Kasus <span id="h5-counter">1</span></span>
+                    <div class="flex items-center gap-4 mb-2">
+                         <div class="bg-green-500 text-white p-2 rounded-lg shadow-md"><i data-lucide="shield" class="w-6 h-6"></i></div>
+                         <h2 class="text-green-800 font-bold text-lg uppercase">Aku Ikut Menjaga</h2>
+                    </div>
+                    <p id="h5-problem-text" class="text-2xl md:text-3xl font-display text-slate-800 text-center py-4"></p>
+                </div>
+                <div class="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <div class="glass-card p-4 flex flex-col h-full !border-t-4 !border-t-blue-500">
+                        <div class="flex items-center gap-2 mb-4 text-blue-700 font-bold"><i data-lucide="heart-handshake"></i> <span id="h5-header-k">1. Lindungi Korban</span></div>
+                        <div class="space-y-2 max-h-48 overflow-y-auto custom-scroll mb-2 flex-1" id="h5-list-korban"></div>
+                        <div id="slot-korban" class="mt-auto p-3 bg-white/50 border-2 border-dashed border-blue-300 rounded-xl min-h-[50px] flex items-center justify-center text-slate-500 text-xs md:text-sm text-center font-medium transition-colors">Pilih tindakan</div>
+                    </div>
+                    <div class="glass-card p-4 flex flex-col h-full !border-t-4 !border-t-orange-500">
+                        <div class="flex items-center gap-2 mb-4 text-orange-700 font-bold"><i data-lucide="users"></i> <span id="h5-header-p">2. Bimbing Pelaku</span></div>
+                        <div class="space-y-2 max-h-48 overflow-y-auto custom-scroll mb-2 flex-1" id="h5-list-pelaku"></div>
+                        <div id="slot-pelaku" class="mt-auto p-3 bg-white/50 border-2 border-dashed border-orange-300 rounded-xl min-h-[50px] flex items-center justify-center text-slate-500 text-xs md:text-sm text-center font-medium transition-colors">Pilih tindakan</div>
+                    </div>
+                    <div class="glass-card p-4 flex flex-col h-full !border-t-4 !border-t-emerald-500">
+                        <div class="flex items-center gap-2 mb-4 text-emerald-700 font-bold"><i data-lucide="sprout"></i> <span id="h5-header-l">3. Pulihkan Keadaan</span></div>
+                        <div class="space-y-2 max-h-48 overflow-y-auto custom-scroll mb-2 flex-1" id="h5-list-lingkungan"></div>
+                        <div id="slot-lingkungan" class="mt-auto p-3 bg-white/50 border-2 border-dashed border-emerald-300 rounded-xl min-h-[50px] flex items-center justify-center text-slate-500 text-xs md:text-sm text-center font-medium transition-colors">Pilih tindakan</div>
+                    </div>
+                </div>
+                <div class="mt-auto text-center pb-8">
+                    <button id="btn-check-h5" onclick="checkH5Answer()" class="btn-game bg-green-600 text-white font-bold text-xl md:text-2xl py-3 px-12 rounded-full shadow-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:scale-105 border-b-4 border-green-800 active:border-b-0 active:translate-y-1">CEK SOLUSI</button>
+                </div>
+            </div>
+
+            <!-- SCENE END: FINISH -->
+            <div id="scene-finish" class="scene hidden absolute inset-0 flex flex-col items-center justify-center animate-pop overflow-y-auto p-8">
+                <i data-lucide="trophy" class="w-24 h-24 md:w-32 md:h-32 text-yellow-400 mb-4 crown-icon filter drop-shadow-[0_0_15px_rgba(250,204,21,0.6)]"></i>
+                <h1 class="font-display text-4xl md:text-6xl text-white mb-8 text-center drop-shadow-md text-stroke-black" style="text-shadow: 0 4px 0 #000;">PERJALANAN SELESAI!</h1>
+                
+                <div id="leaderboard" class="w-full max-w-2xl grid gap-4 mb-8"></div>
+
+                <div class="glass-card p-8 text-center border-4 border-yellow-400 max-w-xl w-full relative overflow-hidden bg-white/95">
+                    <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-yellow-300 via-yellow-500 to-yellow-300"></div>
+                    <div class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">Pemenang Utama</div>
+                    <div class="text-2xl text-slate-500 font-bold uppercase mb-1">Teladan Sekolah Aman</div>
+                    <div id="winner-name" class="font-display text-4xl md:text-5xl text-indigo-600 mb-4 drop-shadow-sm">Nama Pemenang</div>
+                    <p class="text-slate-600 italic font-medium">"Sekolah aman dimulai dari kita!"</p>
+                </div>
+
+                <button onclick="location.reload()" class="mt-12 bg-slate-800 text-white px-10 py-4 rounded-2xl font-bold hover:bg-slate-700 text-xl shadow-lg transition-transform hover:-translate-y-1">Main Lagi</button>
+            </div>
+
+            <!-- MODAL RUMUS AMAN (TOAST) -->
+            <div id="modal-rumus-aman" class="hidden absolute inset-0 bg-black/70 z-[100] flex items-center justify-center backdrop-blur-md p-4 transition-opacity duration-300">
+                <div class="glass-card p-10 md:p-14 text-center animate-pop flex flex-col items-center gap-6 border-8 border-yellow-400 shadow-[0_0_50px_rgba(250,204,21,0.4)] max-w-2xl">
+                    <div id="rumus-icon" class="text-7xl md:text-9xl animate-bounce drop-shadow-xl">❤️</div>
+                    <div>
+                       <h2 id="rumus-title" class="font-display text-4xl md:text-5xl text-slate-800 mb-4 tracking-wide">HARGAI</h2>
+                       <p id="rumus-desc" class="text-xl md:text-2xl text-slate-600 font-bold max-w-lg leading-relaxed"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODAL FEEDBACK -->
+            <div id="modal-feedback" class="hidden absolute inset-0 bg-black/60 z-[60] flex items-center justify-center backdrop-blur-sm p-4">
+                <div class="glass-card p-8 max-w-md w-full text-center animate-pop border-4 border-white/80 relative bg-white/95">
+                    <div id="modal-icon" class="mx-auto mb-4"></div>
+                    <h2 id="modal-title" class="text-3xl font-display mb-2"></h2>
+                    <p id="modal-message" class="text-lg text-slate-600 mb-8 leading-relaxed"></p>
+                    <button onclick="closeModal()" class="btn-game bg-slate-800 text-white text-xl font-bold py-3 px-8 rounded-xl w-full hover:bg-slate-700 transition-colors shadow-lg">LANJUT</button>
+                </div>
+            </div>
+
+            <!-- MODAL INSTRUCTION -->
+            <div id="modal-instruction" class="hidden absolute inset-0 bg-yellow-500/80 z-[55] flex items-center justify-center backdrop-blur-md p-4">
+                <div class="glass-card p-6 md:p-10 max-w-3xl w-full text-center animate-pop border-8 border-yellow-400 relative overflow-hidden bg-white/95">
+                    <h2 id="instr-title" class="text-3xl md:text-4xl font-display text-slate-800 mb-6">CARA BERMAIN</h2>
+                    <div class="flex flex-col md:flex-row items-center justify-center gap-6 mb-8 text-left bg-yellow-50 p-6 rounded-2xl border-2 border-yellow-200">
+                        <div id="instr-icon" class="bg-white p-4 rounded-full border-2 border-slate-200 shadow-sm shrink-0"></div>
+                        <div><p id="instr-text" class="text-lg md:text-2xl text-slate-700 font-medium leading-relaxed"></p></div>
+                    </div>
+                    <button onclick="closeInstruction()" class="btn-game bg-green-500 text-white font-display text-2xl md:text-3xl py-4 px-12 rounded-full shadow-lg hover:bg-green-600 transition-transform hover:scale-105 border-b-4 border-green-700 active:border-b-0 active:translate-y-1">SIAP MAIN!</button>
+                </div>
+            </div>
+
+            <!-- MODAL MENU -->
+            <div id="modal-menu" class="hidden absolute inset-0 bg-black/60 z-[70] flex items-center justify-center backdrop-blur-sm p-4">
+                <div class="glass-card p-8 max-w-sm w-full animate-pop border-4 border-yellow-400 flex flex-col gap-4 bg-white/95">
+                    <h2 class="text-3xl font-display text-center text-slate-800 mb-2">MENU</h2>
+                    <button onclick="menuAction('home')" class="btn-game bg-red-100 text-red-700 font-bold py-4 rounded-xl border-2 border-red-300 flex items-center justify-center gap-2 hover:bg-red-200"><i data-lucide="home"></i> Menu Utama</button>
+                    <button onclick="menuAction('materi')" class="btn-game bg-green-100 text-green-700 font-bold py-4 rounded-xl border-2 border-green-300 flex items-center justify-center gap-2 hover:bg-green-200"><i data-lucide="book-open"></i> Buka Rangkuman</button>
+                    <button onclick="menuAction('map')" class="btn-game bg-sky-100 text-sky-700 font-bold py-4 rounded-xl border-2 border-sky-300 flex items-center justify-center gap-2 hover:bg-sky-200"><i data-lucide="map"></i> Lihat Peta</button>
+                    <button onclick="toggleMenu()" class="mt-4 bg-slate-800 text-white font-bold py-3 rounded-xl hover:bg-slate-700 shadow-lg">Tutup</button>
+                </div>
+            </div>
+
+            <!-- MODAL MATERI -->
+            <div id="modal-materi" class="hidden absolute inset-0 bg-black/80 z-[80] flex items-center justify-center backdrop-blur-md p-4">
+                <div class="bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl animate-slide relative border-8 border-indigo-500 overflow-hidden">
+                    <div class="bg-indigo-600 p-6 flex justify-between items-center shadow-md z-10">
+                        <h2 class="text-2xl md:text-3xl font-display text-white flex items-center gap-3"><i data-lucide="book" class="w-8 h-8"></i> Rangkuman BSAN</h2>
+                        <button onclick="closeMateri()" class="bg-indigo-800 hover:bg-indigo-900 text-white p-2 rounded-full transition"><i data-lucide="x" class="w-6 h-6"></i></button>
+                    </div>
+                    <div id="materi-content-container" class="p-6 md:p-8 overflow-y-auto bg-slate-50 text-slate-800 leading-relaxed custom-scroll">
+                        <!-- Injected dynamically -->
+                    </div>
+                    <div class="p-4 bg-white border-t border-slate-200 text-center">
+                        <button onclick="closeMateri()" class="bg-indigo-600 text-white font-bold py-3 px-12 rounded-xl hover:bg-indigo-700 w-full md:w-auto shadow-lg transition-transform active:scale-95">Tutup & Main</button>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator(); const gainNode = audioCtx.createGain();
+            osc.connect(gainNode); gainNode.connect(audioCtx.destination);
+            if (type === 'correct') {
+                osc.type = 'sine'; osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(1046.5, audioCtx.currentTime + 0.1); 
+                gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5); osc.start(); osc.stop(audioCtx.currentTime + 0.5);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, audioCtx.currentTime); osc.frequency.linearRampToValueAtTime(100, audioCtx.currentTime + 0.3);
+                gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3); osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+            } else if (type === 'click') {
+                osc.type = 'triangle'; osc.frequency.setValueAtTime(300, audioCtx.currentTime); gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1); osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+            } else if (type === 'win') {
+                [523.25, 659.25, 783.99].forEach((freq, i) => { const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.connect(g); g.connect(audioCtx.destination); o.type = 'triangle'; o.frequency.value = freq; g.gain.setValueAtTime(0.2, audioCtx.currentTime + (i*0.1)); g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1.5 + (i*0.1)); o.start(audioCtx.currentTime + (i*0.1)); o.stop(audioCtx.currentTime + 2.0); });
+            } else if (type === 'pop') {
+                osc.type = 'sine'; osc.frequency.setValueAtTime(800, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
+                gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2); osc.start(); osc.stop(audioCtx.currentTime + 0.2);
+            }
+        }
+
+        const bgm = document.getElementById('bgm'); let isMuted = true; 
+        function toggleAudio() { isMuted = !isMuted; if(!isMuted) { bgm.play().catch(e => console.log("Audio fail", e)); } else { bgm.pause(); } }
+        function toggleFullscreen() { if (!document.fullscreenElement) { document.documentElement.requestFullscreen().catch(err => {}); } else { if (document.exitFullscreen) document.exitFullscreen(); } }
+
+        const avatars = [
+            { name: "Aman", img: "https://i.imgur.com/tCcRw6n.png" }, { name: "Niana", img: "https://i.imgur.com/Cp4kbGN.png" },
+            { name: "Raka", img: "https://i.imgur.com/5Cbgb3W.png" }, { name: "Safa", img: "https://i.imgur.com/YIo3hQP.png" },
+            { name: "Danu", img: "https://i.imgur.com/cCmw5AA.png" }, { name: "Kirana", img: "https://i.imgur.com/v26U632.png" },
+            { name: "Hadi", img: "https://i.imgur.com/tRhQ9Oo.png" }, { name: "Badai", img: "https://i.imgur.com/LoRzqEX.png" },
+            { name: "Lestari", img: "https://i.imgur.com/qISRpLr.png" }, { name: "Rama", img: "https://i.imgur.com/3ycLzKd.png" }
+        ];
+
+        // 9 Asas Versi Anak
+        const ASAS = {
+            HUMANIS: "❤️ Aku menghargai semua orang", KOMPREHENSIF: "🌱 Aku menjaga diri dan lingkungan",
+            PARTISIPATIF: "🤝 Aku ikut menjaga sekolah", KEPENTINGAN: "👧 Aku berhak aman dan nyaman",
+            NONDISKRIMINATIF: "🌈 Aku tidak membeda-bedakan teman", INKLUSIF: "🫶 Semua teman boleh ikut",
+            GENDER: "⚖️ Laki-laki dan perempuan sama berharga", HARMONIS: "😊 Aku hidup rukun dengan semua",
+            BERKELANJUTAN: "🔄 Aku melakukan kebaikan setiap hari"
+        };
+        const ASAS_LIST = Object.values(ASAS);
+
+        // Helper function to build standard Halte 2 Categories and Halte 3 Roles
+        const H2_CATS = [ 
+            { id: "SPIRITUAL", label: "KEBUTUHAN SPIRITUAL", icon: "moon", color: "purple" }, 
+            { id: "FISIK", label: "PERLINDUNGAN FISIK", icon: "shield", color: "orange" }, 
+            { id: "PSIKOSOSIAL", label: "PSIKOLOGIS & SOSIOKULTURAL", icon: "heart", color: "pink" },
+            { id: "DIGITAL", label: "KEAMANAN DIGITAL", icon: "smartphone", color: "blue" }
+        ];
+        const H3_ROLES = [ { id: "MENCEGAH", label: "MENCEGAH", icon: "shield", color: "blue" }, { id: "MEMBANTU", label: "MEMBANTU", icon: "heart-handshake", color: "green" }, { id: "MELAPOR", label: "MELAPOR", icon: "megaphone", color: "purple" }, { id: "MENJAGA", label: "MENJAGA", icon: "users", color: "orange" } ];
+
+        const decoySolutions = [ "Diam saja pura-pura tidak lihat.", "Balas dendam dan memukulnya.", "Menyebarkan masalah itu ke orang lain.", "Menertawakan dari kejauhan." ];
+
+        // 6 Set Level Berdasarkan Kelas
+        const gameData = {
+            kelas1: {
+                mapLabels: ["Mengenal Aman", "Ruang Amanku", "Membantu Teman", "Aman Menonton", "Berbuat Baik"],
+                h1: {
+                    asasPool: [ASAS.HUMANIS, ASAS.HARMONIS, ASAS.KEPENTINGAN],
+                    q: [
+                        { q: "Menertawakan teman yang jatuh tersandung.", key: "TS", asas: ASAS.HUMANIS },
+                        { q: "Merapikan alat tulis setelah belajar.", key: "S", asas: ASAS.KEPENTINGAN },
+                        { q: "Bermain rukun bersama teman sebangku.", key: "S", asas: ASAS.HARMONIS }
+                    ]
+                },
+                h2: {
+                    categories: H2_CATS,
+                    cards: [
+                        { text: "Berlari kencang di dalam kelas yang sempit.", type: "TA", cat: "FISIK" },
+                        { text: "Berdiam diri saat teman menangis keras.", type: "TA", cat: "PSIKOSOSIAL" },
+                        { text: "Berdoa dengan tenang saat pelajaran agama.", type: "A", cat: "SPIRITUAL" },
+                        { text: "Bermain HP terlalu lama sampai mata sakit.", type: "TA", cat: "DIGITAL" }
+                    ]
+                },
+                h3: {
+                    roles: H3_ROLES,
+                    q: [
+                        { role: "MEMBANTU", problem: "Temanmu menangis karena pensilnya patah.", solution: "Berhenti dan tanyakan kenapa, lalu bantu pinjamkan pensil." },
+                        { role: "MELAPOR", problem: "Kamu melihat ada pecahan kaca di lantai kelas.", solution: "Menjauh dari kaca itu dan beri tahu ibu guru." },
+                        { role: "MENCEGAH", problem: "Ada genangan air sabun di depan kamar mandi.", solution: "Beritahu teman untuk tidak lewat situ dan lapor ke petugas." }
+                    ]
+                },
+                h4: {
+                    q: [
+                        { text: "Menonton video kartun yang diajarkan oleh guru.", type: "AMAN" },
+                        { text: "Mengeklik gambar seram yang tiba-tiba muncul di layar.", type: "BAHAYA" },
+                        { text: "Bermain game di HP terlalu lama sampai mata sakit.", type: "BAHAYA" }
+                    ]
+                },
+                h5: {
+                    headers: ["1. Cek Teman", "2. Beri Tahu Guru", "3. Kembali Rukun"],
+                    problems: ["Dua temanmu berebut mainan sampai satu menangis.", "Temanmu terpeleset karena kulit pisang."],
+                    korban: ["Tanya apakah dia terluka atau sedih.", "Bantu temanmu berdiri dengan pelan."],
+                    pelaku: ["Laporkan ke guru agar dibantu berdamai.", "Beri tahu guru agar yang membuang dinasihati."],
+                    lingkungan: ["Bermain bersama lagi secara bergantian.", "Buang kulit pisang itu ke tempat sampah."]
+                }
+            },
+            kelas2: {
+                mapLabels: ["Menghargai", "Menjaga Diri", "Aksi Peduli", "Cerdas Menonton", "Membangun Rukun"],
+                h1: {
+                    asasPool: [ASAS.KOMPREHENSIF, ASAS.NONDISKRIMINATIF, ASAS.INKLUSIF],
+                    q: [
+                        { q: "Mengajak teman yang pemalu untuk ikut bermain bola.", key: "S", asas: ASAS.INKLUSIF },
+                        { q: "Membuang sampah jajan di laci meja teman.", key: "TS", asas: ASAS.KOMPREHENSIF },
+                        { q: "Hanya mau berteman dengan orang yang satu daerah asal.", key: "TS", asas: ASAS.NONDISKRIMINATIF }
+                    ]
+                },
+                h2: {
+                    categories: H2_CATS,
+                    cards: [
+                        { text: "Bermain ayunan dengan hati-hati secara bergantian.", type: "A", cat: "FISIK" },
+                        { text: "Memaksa teman memakan bekal yang dilarang agamanya.", type: "TA", cat: "SPIRITUAL" },
+                        { text: "Mengejek nama orang tua teman agar semua tertawa.", type: "TA", cat: "PSIKOSOSIAL" },
+                        { text: "Menonton video di tablet sesuai arahan guru.", type: "A", cat: "DIGITAL" }
+                    ]
+                },
+                h3: {
+                    roles: H3_ROLES,
+                    q: [
+                        { role: "MENCEGAH", problem: "Melihat teman mendorong-dorong di barisan masuk kelas.", solution: "Katakan 'Berhenti' agar tidak ada yang jatuh." },
+                        { role: "MEMBANTU", problem: "Temanmu tidak bawa bekal dan terlihat kelaparan.", solution: "Berbagi sedikit makananmu kepadanya." },
+                        { role: "MELAPOR", problem: "Ada orang dewasa tak dikenal masuk memanggil temanmu.", solution: "Segera menjauh dan lapor kepada guru atau satpam." }
+                    ]
+                },
+                h4: {
+                    q: [
+                        { text: "Mengirim foto memalukan teman ke grup kelas.", type: "BAHAYA" },
+                        { text: "Menjawab pesan dari nomor tak dikenal yang minta alamat rumah.", type: "BAHAYA" },
+                        { text: "Menggunakan tablet sekolah untuk mencari tugas pelajaran.", type: "AMAN" }
+                    ]
+                },
+                h5: {
+                    headers: ["1. Lindungi Korban", "2. Tegur Pelaku", "3. Rapikan Kelas"],
+                    problems: ["Buku catatan teman dicoret-coret dengan sengaja.", "Air minum teman sengaja ditumpahkan ke mejanya."],
+                    korban: ["Hibur dia dan berikan penghapusmu.", "Berikan tisu untuk mengelap bukunya yang basah."],
+                    pelaku: ["Lapor ke guru agar pelaku meminta maaf.", "Beri tahu pelaku bahwa itu tidak baik dan lapor guru."],
+                    lingkungan: ["Bantu membersihkan meja yang kotor akibat coretan.", "Bantu mengepel atau melap meja sampai kering."]
+                }
+            },
+            kelas3: {
+                mapLabels: ["Hargai Beda", "Cek Keamanan", "Berani Bicara", "Digital T.H.I.N.K", "Bantu Jaga"],
+                h1: {
+                    asasPool: [ASAS.NONDISKRIMINATIF, ASAS.HARMONIS, ASAS.PARTISIPATIF],
+                    q: [
+                        { q: "Mengucapkan salam perayaan hari besar agama kepada teman yang merayakan.", key: "S", asas: ASAS.HARMONIS },
+                        { q: "Tidak meminjamkan buku karena temanmu berbeda suku.", key: "TS", asas: ASAS.NONDISKRIMINATIF },
+                        { q: "Ikut kerja bakti membersihkan perpustakaan sekolah.", key: "S", asas: ASAS.PARTISIPATIF }
+                    ]
+                },
+                h2: {
+                    categories: H2_CATS,
+                    cards: [
+                        { text: "Menyoraki teman yang gagap saat membaca ke depan.", type: "TA", cat: "PSIKOSOSIAL" },
+                        { text: "Pintu gerbang sekolah berkarat dan tajam.", type: "TA", cat: "FISIK" },
+                        { text: "Mendengarkan dengan tenang saat teman sedang beribadah.", type: "A", cat: "SPIRITUAL" },
+                        { text: "Menyebarkan foto lucu teman agar ditertawakan di medsos.", type: "TA", cat: "DIGITAL" }
+                    ]
+                },
+                h3: {
+                    roles: H3_ROLES,
+                    q: [
+                        { role: "MELAPOR", problem: "Kamu melihat teman memalak uang jajan teman lain.", solution: "Menjauh dari mereka dan segera ceritakan ke guru kelas." },
+                        { role: "MENCEGAH", problem: "Teman-teman mau mencorat-coret dinding toilet.", solution: "Katakan 'Tolong Berhenti' karena itu merusak sekolah." },
+                        { role: "MEMBANTU", problem: "Seorang teman dijauhi karena logat bicaranya berbeda.", solution: "Ajak dia bergabung di kelompok bermainmu." }
+                    ]
+                },
+                h4: {
+                    q: [
+                        { text: "Mengklik link 'Selamat Kamu Dapat HP Gratis' di grup WA.", type: "BAHAYA" },
+                        { text: "Membuat video TikTok yang mengejek teman sekelas.", type: "BAHAYA" },
+                        { text: "Bertanya kepada guru jika melihat video yang menakutkan.", type: "AMAN" }
+                    ]
+                },
+                h5: {
+                    headers: ["1. Dampingi", "2. Bimbing", "3. Perbaiki"],
+                    problems: ["Ada ejekan nama orang tua berulang kali di kelas.", "Mainan bola direbut paksa lalu dibuang ke selokan."],
+                    korban: ["Temani teman yang diejek agar ia tidak menangis sendiri.", "Bantu dia mengambil bola atau ajak main yang lain."],
+                    pelaku: ["Laporkan kepada guru agar pelaku dinasihati.", "Beri tahu guru bahwa pelaku merampas barang orang."],
+                    lingkungan: ["Guru membuat aturan kelas tentang larangan mengejek.", "Buat kesepakatan bahwa bermain bola harus rukun."]
+                }
+            },
+            kelas4: {
+                mapLabels: ["Setara & Adil", "Zona Aman", "Cegah Kekerasan", "Jejak Digital", "Peran Aktif"],
+                h1: {
+                    asasPool: [ASAS.GENDER, ASAS.HUMANIS, ASAS.INKLUSIF],
+                    q: [
+                        { q: "Melarang anak perempuan ikut main futsal padahal dia pintar main.", key: "TS", asas: ASAS.GENDER },
+                        { q: "Berbagi tempat duduk dengan murid yang berkursi roda.", key: "S", asas: ASAS.INKLUSIF },
+                        { q: "Sengaja menginjak sepatu baru teman agar kotor.", key: "TS", asas: ASAS.HUMANIS }
+                    ]
+                },
+                h2: {
+                    categories: H2_CATS,
+                    cards: [
+                        { text: "Mengancam teman jika tidak mau memberi contekan.", type: "TA", cat: "PSIKOSOSIAL" },
+                        { text: "Railing (pegangan) tangga sekolah patah dan goyah.", type: "TA", cat: "FISIK" },
+                        { text: "Sekolah memfasilitasi doa bersama lintas agama.", type: "A", cat: "SPIRITUAL" },
+                        { text: "Mengirim pesan kasar ke nomor teman yang tidak dikenal.", type: "TA", cat: "DIGITAL" }
+                    ]
+                },
+                h3: {
+                    roles: H3_ROLES,
+                    q: [
+                        { role: "MENJAGA", problem: "Ada kelompok yang sering menghadang murid di lorong.", solution: "Jangan lewat sendirian dan laporkan hal ini ke wali kelas." },
+                        { role: "MENCEGAH", problem: "Mendengar teman menyusun rencana menjahili anak baru.", solution: "Katakan dengan tegas untuk membatalkan rencana itu." },
+                        { role: "MEMBANTU", problem: "Temanmu menangis karena dipermalukan saat upacara.", solution: "Ajak dia menjauh dari keramaian dan tenangkan dia." }
+                    ]
+                },
+                h4: {
+                    q: [
+                        { text: "Menyebarkan meme berisi hinaan fisik (body shaming).", type: "BAHAYA" },
+                        { text: "Membagikan pesan berantai (hoax) tentang penculikan tanpa cek.", type: "BAHAYA" },
+                        { text: "Menulis komentar yang sopan dan menyemangati di karya teman.", type: "AMAN" }
+                    ]
+                },
+                h5: {
+                    headers: ["1. Amankan Korban", "2. Tindak Pelaku", "3. Pemulihan"],
+                    problems: ["Terjadi pertengkaran fisik karena saling ejek di lapangan.", "Tas teman disembunyikan dan isinya dihamburkan."],
+                    korban: ["Segera pisahkan dan bawa korban ke UKS atau ruang guru.", "Bantu teman tersebut mengumpulkan kembali barangnya."],
+                    pelaku: ["Laporkan pelaku ke guru untuk diberikan bimbingan.", "Tegur pelaku dan laporkan agar ia menerima sanksi disiplin."],
+                    lingkungan: ["Bantu guru mendamaikan dan kampanye anti kekerasan.", "Buat peringatan kelas agar saling menghargai barang pribadi."]
+                }
+            },
+            kelas5: {
+                mapLabels: ["Hak & Keadilan", "Cek Risiko", "Bystander Aktif", "Netiket", "Agen Perubahan"],
+                h1: {
+                    asasPool: [ASAS.KEPENTINGAN, ASAS.PARTISIPATIF, ASAS.BERKELANJUTAN],
+                    q: [
+                        { q: "Menyapa penjaga sekolah, satpam, dan guru setiap pagi.", key: "S", asas: ASAS.BERKELANJUTAN },
+                        { q: "Mengajukan ide membuat pojok curhat ke guru BK.", key: "S", asas: ASAS.PARTISIPATIF },
+                        { q: "Membocorkan rahasia murid yang sedang konseling ke teman lain.", key: "TS", asas: ASAS.KEPENTINGAN }
+                    ]
+                },
+                h2: {
+                    categories: H2_CATS,
+                    cards: [
+                        { text: "Guru memberikan waktu khusus jika ada murid perlu ibadah.", type: "A", cat: "SPIRITUAL" },
+                        { text: "Membiarkan teman terus-menerus disindir (dighibah) di kelas.", type: "TA", cat: "PSIKOSOSIAL" },
+                        { text: "Jalur evakuasi sekolah tertutup tumpukan meja rusak.", type: "TA", cat: "FISIK" },
+                        { text: "Membagikan password akun sekolah kepada orang lain.", type: "TA", cat: "DIGITAL" }
+                    ]
+                },
+                h3: {
+                    roles: H3_ROLES,
+                    q: [
+                        { role: "MENCEGAH", problem: "Melihat grup WA rahasia yang isinya menjelekkan teman.", solution: "Keluar dari grup tersebut lalu cerita (lapor) ke guru kelas." },
+                        { role: "MELAPOR", problem: "Ada orang yang sering memalak uang jajan di gerbang.", solution: "Ajak teman lain menjauh dan segera laporkan ke satpam/guru." },
+                        { role: "MEMBANTU", problem: "Teman merasa rendah diri dan dikucilkan dari kelompok.", solution: "Ajak dia mengobrol, beri semangat, dan masukkan ke kelompokmu." }
+                    ]
+                },
+                h4: {
+                    q: [
+                        { text: "Minta izin dulu sebelum memposting foto grup ke Instagram.", type: "AMAN" },
+                        { text: "Memberikan password sosmed kita kepada sahabat karib.", type: "BAHAYA" },
+                        { text: "Ikut menulis komentar kasar kepada sekolah lain di medsos.", type: "BAHAYA" }
+                    ]
+                },
+                h5: {
+                    headers: ["1. Lindungi Korban", "2. Bimbing Pelaku", "3. Pulihkan Keadaan"],
+                    problems: ["Ada kasus pengucilan yang sudah berlangsung lama pada satu murid.", "Seorang murid dipaksa mengerjakan PR anak-anak lain (pemalakan tugas)."],
+                    korban: ["Dekati korban, berikan dukungan mental agar ia tidak merasa sendiri.", "Bantu dia menolak dengan tegas, dan dampingi saat lapor ke guru."],
+                    pelaku: ["Laporkan ke guru kelas atau guru BK agar dilakukan pemanggilan.", "Laporkan ke guru agar pelaku diproses dan diberi sanksi mendidik."],
+                    lingkungan: ["Usulkan kegiatan kelompok yang mengacak anggota agar saling baur.", "Adakan kampanye kejujuran dan saling menghargai usaha di kelas."]
+                }
+            },
+            kelas6: {
+                mapLabels: ["Nilai Keteladanan", "Audit Keamanan", "Kepemimpinan", "Jejak Digital Aman", "Inisiator"],
+                h1: {
+                    asasPool: [ASAS.GENDER, ASAS.INKLUSIF, ASAS.BERKELANJUTAN],
+                    q: [
+                        { q: "Membantu membuat poster kampanye 'Sekolah Bebas Perundungan'.", key: "S", asas: ASAS.BERKELANJUTAN },
+                        { q: "Meremehkan ketua kelas perempuan dengan alasan ia tidak tegas.", key: "TS", asas: ASAS.GENDER },
+                        { q: "Menyiapkan kursi khusus di barisan depan untuk murid difabel.", key: "S", asas: ASAS.INKLUSIF }
+                    ]
+                },
+                h2: {
+                    categories: H2_CATS,
+                    cards: [
+                        { text: "Alat Pemadam Api Ringan (APAR) kadaluarsa dan tidak diurus.", type: "TA", cat: "FISIK" },
+                        { text: "Sekolah menjamin rahasia pelapor perundungan sangat aman.", type: "A", cat: "PSIKOSOSIAL" },
+                        { text: "Melarang teman minoritas untuk berdoa sesuai keyakinannya.", type: "TA", cat: "SPIRITUAL" },
+                        { text: "Menyebarkan hoaks atau berita bohong di grup WA kelas.", type: "TA", cat: "DIGITAL" }
+                    ]
+                },
+                h3: {
+                    roles: H3_ROLES,
+                    q: [
+                        { role: "MENJAGA", problem: "Adik kelas diganggu oleh kakak kelas saat istirahat.", solution: "Berani menegur kakak kelas (Berhenti) dan laporkan ke guru jaga." },
+                        { role: "MENCEGAH", problem: "Teman menyebarkan hoax yang bisa memicu tawuran.", solution: "Beritahu di grup bahwa itu hoax, dan minta ia menghapusnya." },
+                        { role: "MELAPOR", problem: "Terdapat indikasi pelecehan (sentuhan tidak pantas) di sekolah.", solution: "Bawa korban ke tempat aman dan segera cerita ke kepala sekolah." }
+                    ]
+                },
+                h4: {
+                    q: [
+                        { text: "Membagikan video tawuran sekolah lain ke grup kelas WhatsApp.", type: "BAHAYA" },
+                        { text: "Membantu melaporkan (report) akun anonim yang melakukan cyberbullying.", type: "AMAN" },
+                        { text: "Mengunggah data KTP/KK orang tua di status media sosial.", type: "BAHAYA" }
+                    ]
+                },
+                h5: {
+                    headers: ["1. Lindungi Korban", "2. Bimbing Pelaku", "3. Pulihkan Iklim"],
+                    problems: ["Cyberbullying parah: foto editan memalukan murid disebar di grup sekolah.", "Pengeroyokan verbal/sindiran parah antar geng di dalam kelas."],
+                    korban: ["Dampingi secara psikologis, minta hapus foto, jauhkan dari internet sementara.", "Pisahkan mereka secara fisik agar suasana mereda terlebih dahulu."],
+                    pelaku: ["Kumpulkan bukti screenshot, laporkan ke guru untuk tindak lanjut tegas.", "Lapor wali kelas untuk dilakukan mediasi (pertemuan) mencari akar masalah."],
+                    lingkungan: ["Bantu sekolah menggalakkan literasi digital tentang jerat hukum UU ITE.", "Gagas acara kebersamaan angkatan agar kekompakan positif kembali terjalin."]
+                }
+            }
+        };
+
+        const instructions = {
+            1: { icon: "clipboard-list" }, 2: { icon: "shield" }, 3: { icon: "users" },
+            4: { icon: "smartphone" }, 5: { icon: "sprout" }
+        };
+
+        let state = {
+            screen: 'intro', difficulty: 'kelas1', currentLevel: 1, players: [], activePlayerIdx: 0,
+            playerProgress: {}, availableH1: [], availableH2: [], availableH3: [], availableH4: [],
+            h1CurrentQ: null, h2CurrentCard: null, h3CurrentQ: null, h4CurrentQ: null,
+            h5Selections: { k: null, p: null, l: null, problemIdx: 0 },
+            usedH3: new Set(), usedH5: new Set()
+        };
+
+        const screens = {
+            intro: document.getElementById('scene-intro'), difficulty: document.getElementById('scene-difficulty'),
+            playerCount: document.getElementById('scene-player-count'), charSelect: document.getElementById('scene-char-select'), 
+            map: document.getElementById('scene-map'), halte1: document.getElementById('scene-halte1'),
+            halte2: document.getElementById('scene-halte2'), halte3: document.getElementById('scene-halte3'),
+            halte4: document.getElementById('scene-halte4'), halte5: document.getElementById('scene-halte5'),
+            finish: document.getElementById('scene-finish')
+        };
+        const scoreDisplay = document.getElementById('score-display');
+        const stageText = document.getElementById('current-stage-text');
+
+        lucide.createIcons();
+
+        // Populate Character Grid
+        const avatarGrid = document.getElementById('avatar-grid');
+        avatars.forEach(char => {
+            const btn = document.createElement('button');
+            btn.className = "avatar-card bg-slate-100 p-2 rounded-xl border-2 border-slate-300 flex flex-col items-center cursor-pointer hover:bg-white transition-all";
+            btn.setAttribute('data-name', char.name); 
+            btn.onclick = () => selectAvatar(char);
+            btn.innerHTML = `
+                <div class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-white mb-2 overflow-hidden border-2 border-slate-200 shadow-sm">
+                    <img src="${char.img}" alt="${char.name}" class="w-full h-full object-cover object-top">
+                </div>
+                <span class="font-bold text-slate-600 text-sm">${char.name}</span>
+            `;
+            avatarGrid.appendChild(btn);
+        });
+
+        // --- SCOREBOARD ---
+        function toggleScoreboard() {
+            const sb = document.getElementById('scoreboard-widget');
+            sb.classList.toggle('hidden'); document.getElementById('score-badge').classList.add('hidden'); 
+            updateScoreboard();
+        }
+
+        function updateScoreboard() {
+            const list = document.getElementById('scoreboard-list'); list.innerHTML = '';
+            const sorted = [...state.players].sort((a,b) => b.score - a.score);
+            sorted.forEach((p, i) => {
+                const isActive = (state.players[state.activePlayerIdx] && p.name === state.players[state.activePlayerIdx].name);
+                const row = document.createElement('div');
+                row.className = `flex items-center justify-between p-2 rounded-lg score-row ${isActive ? 'active' : 'hover:bg-slate-100'}`;
+                row.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-bold text-slate-400 w-4">${i+1}.</span>
+                        <img src="${p.avatar.img}" class="w-6 h-6 rounded-full bg-slate-200">
+                        <span class="text-sm font-semibold text-slate-700 ${isActive ? 'text-blue-700' : ''}">${p.name} ${isActive ? '<span class="text-xs bg-blue-100 text-blue-600 px-1 rounded ml-1">Main</span>' : ''}</span>
+                    </div>
+                    <span class="font-bold text-slate-800">${p.score}</span>
+                `;
+                list.appendChild(row);
+            });
+        }
+
+        function goToDifficulty() { playSound('click'); if(bgm.paused) toggleAudio(); switchScreen('difficulty'); }
+        function selectDifficulty(diff) { playSound('click'); state.difficulty = diff; switchScreen('playerCount'); }
+        
+        let targetPlayerCount = 1;
+        function selectPlayerCount(n) { playSound('click'); targetPlayerCount = n; state.players = []; setupCharSelect(); switchScreen('charSelect'); }
+
+        function setupCharSelect() {
+            document.getElementById('char-select-title').innerText = `Pemain ${state.players.length + 1}: Pilih Karaktermu`;
+            document.querySelectorAll('.avatar-card').forEach(btn => {
+                const isTaken = state.players.some(p => p.name === btn.getAttribute('data-name'));
+                if (isTaken) { btn.classList.add('taken'); btn.classList.remove('selected'); } 
+                else { btn.classList.remove('taken', 'selected'); }
+            });
+        }
+
+        function selectAvatar(char) {
+            playSound('click');
+            if (state.players.some(p => p.name === char.name)) return;
+            state.players.push({ id: state.players.length, name: char.name, avatar: char, score: 0 });
+
+            if (state.players.length < targetPlayerCount) { setupCharSelect(); } 
+            else {
+                state.currentLevel = 1; state.activePlayerIdx = 0;
+                state.players.forEach(p => { state.playerProgress[p.id] = { h1Turns: 0, h2Turns: 0, h3Turns: 0, h4Turns: 0, h5Turns: 0 }; });
+                for(let i=1; i<=5; i++) { document.getElementById(`map-label-${i}`).innerText = gameData[state.difficulty].mapLabels[i-1]; }
+                updateHUD(); switchScreen('map');
+            }
+        }
+
+        function updateHUD() {
+            if(!state.players.length) return;
+            const p = state.players[state.activePlayerIdx];
+            if(p) {
+                const els = { avatar: 'header-avatar', name: 'header-name', score: 'score-display', info: 'player-info', badge: 'turn-counter-badge' };
+                if(document.getElementById(els.avatar)) document.getElementById(els.avatar).src = p.avatar.img;
+                if(document.getElementById(els.name)) document.getElementById(els.name).innerText = p.name;
+                if(document.getElementById(els.score)) document.getElementById(els.score).innerText = p.score;
+                if(document.getElementById(els.info)) document.getElementById(els.info).classList.remove('hidden');
+                
+                if(document.getElementById(els.badge)) {
+                    let cTurn = state.playerProgress[p.id][`h${state.currentLevel}Turns`] || 0;
+                    document.getElementById(els.badge).innerText = `${Math.min(cTurn + 1, 3)}/3`;
+                }
+                updateScoreboard();
+            }
+        }
+
+        function addScore(points) {
+            state.players[state.activePlayerIdx].score += points;
+            document.getElementById('score-display').innerText = state.players[state.activePlayerIdx].score;
+            document.getElementById('score-badge').classList.remove('hidden'); updateScoreboard();
+        }
+
+        function switchScreen(screenName) {
+            Object.values(screens).forEach(el => { if(el) el.classList.add('hidden'); });
+            if(screens[screenName]) screens[screenName].classList.remove('hidden');
+            state.screen = screenName;
+            
+            if(screenName === 'map') {
+                updateHUD(); renderMap(); stageText.innerText = "Peta Perjalanan";
+            } else if(screenName === 'finish') {
+                renderFinish();
+            } else if (screenName.startsWith('halte')) {
+                updateHUD();
+                const hNum = parseInt(screenName.replace('halte', ''));
+                stageText.innerText = `HALTE ${hNum}`;
+                
+                const d = gameData[state.difficulty];
+                if(hNum === 1 && state.availableH1.length === 0) state.availableH1 = d.h1.q.map((_, i) => i);
+                if(hNum === 2 && state.availableH2.length === 0) state.availableH2 = d.h2.cards.map((_, i) => i);
+                if(hNum === 3 && state.availableH3.length === 0) state.availableH3 = d.h3.q.map((_, i) => i);
+                if(hNum === 4 && state.availableH4.length === 0) state.availableH4 = d.h4.q.map((_, i) => i);
+
+                if(hNum === 1) setupHalte1(); if(hNum === 2) setupHalte2();
+                if(hNum === 3) setupHalte3(); if(hNum === 4) setupHalte4(); if(hNum === 5) setupHalte5();
+                
+                showInstruction(hNum);
+            }
+            lucide.createIcons();
+        }
+
+        function showRumusAman(level) {
+            playSound('pop');
+            const toast = document.getElementById('modal-rumus-aman');
+            const icon = document.getElementById('rumus-icon');
+            const title = document.getElementById('rumus-title');
+            const desc = document.getElementById('rumus-desc');
+            
+            if(level === 1) { icon.innerText = '❤️'; title.innerText = 'HARGAI'; desc.innerText = 'Semua orang berharga dan harus dihormati.'; }
+            if(level === 2) { icon.innerText = '🛡️'; title.innerText = 'LINDUNGI'; desc.innerText = 'Aku menjaga tubuhku dan tubuh teman.'; }
+            if(level === 3) { icon.innerText = '🤝'; title.innerText = 'PEDULI'; desc.innerText = 'Tidak membiarkan teman sendirian ketika ada masalah (Berhenti - Menjauh - Cerita).'; }
+            if(level === 4) { icon.innerText = '📱'; title.innerText = 'BIJAK DIGITAL'; desc.innerText = 'Aman dan sopan saat menggunakan teknologi (T.H.I.N.K).'; }
+            if(level === 5) { icon.innerText = '🗣️'; title.innerText = 'BERANI MELAPOR'; desc.innerText = 'Sekolah aman adalah tugas kita semua. Aku berani mengambil peran!'; }
+            
+            toast.classList.remove('hidden');
+            setTimeout(() => { toast.classList.add('opacity-0'); }, 2000);
+            
+            setTimeout(() => {
+                toast.classList.add('hidden');
+                toast.classList.remove('opacity-0');
+                switchScreen(`halte${level}`);
+            }, 2300);
+        }
+
+        function enterLevel(level) {
+            if(level <= state.currentLevel) { 
+                showRumusAman(level); 
+            } else { playSound('wrong'); }
+        }
+
+        function showModal(correct, title, msg, callback) {
+            const modal = document.getElementById('modal-feedback'); const icon = document.getElementById('modal-icon');
+            const tit = document.getElementById('modal-title'); const mes = document.getElementById('modal-message');
+            
+            modal.classList.remove('hidden');
+            
+            if(title.includes("Ganti Giliran")) {
+                 icon.innerHTML = `<div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce"><i data-lucide="arrow-right" class="w-10 h-10 text-blue-600"></i></div>`;
+                 tit.innerText = title; tit.className = "text-3xl font-display mb-2 text-blue-600";
+            } else if(title.includes("Level Selesai")) {
+                 playSound('win');
+                 icon.innerHTML = `<div class="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce"><i data-lucide="star" class="w-10 h-10 text-yellow-600"></i></div>`;
+                 tit.innerText = title; tit.className = "text-3xl font-display mb-2 text-yellow-600";
+            } else if(correct) {
+                playSound('correct');
+                icon.innerHTML = `<i data-lucide="check-circle" class="w-20 h-20 text-green-500 mx-auto mb-4"></i>`;
+                tit.innerText = "BENAR!"; tit.className = "text-4xl font-display mb-2 text-green-600";
+            } else if (title === "Poin") { 
+                playSound('correct');
+                icon.innerHTML = `<i data-lucide="star" class="w-20 h-20 text-yellow-500 mx-auto mb-4"></i>`;
+                tit.innerText = "POIN DIPEROLEH"; tit.className = "text-4xl font-display mb-2 text-yellow-600";
+            } else {
+                playSound('wrong');
+                icon.innerHTML = `<i data-lucide="x-circle" class="w-20 h-20 text-red-500 mx-auto mb-4"></i>`;
+                tit.innerText = "KURANG TEPAT"; tit.className = "text-4xl font-display mb-2 text-red-600";
+            }
+            mes.innerHTML = msg; lucide.createIcons();
+            window.closeModal = () => { modal.classList.add('hidden'); if(callback) callback(); };
+        }
+
+        function showInstruction(level) {
+            const data = instructions[level]; if(!data) return;
+            const lbl = gameData[state.difficulty].mapLabels[level-1];
+            let text = ""; let title = `HALTE ${level}: ` + lbl;
+            
+            if(level === 1) text = `Baca cerita di layar. Tentukan apakah itu <strong>SESUAI/TIDAK SESUAI</strong>, lalu pilih <strong>Asas Kebaikan</strong> yang benar.`;
+            if(level === 2) text = `Tentukan cerita ini masuk ke <strong>Fokus Utama BSAN</strong> yang mana, lalu pilih apakah situasinya <strong>Aman/Tidak Aman</strong>.`;
+            if(level === 3) text = `Pilih kartu tugasmu. Selesaikan masalah dengan tindakan <strong>(Ingat 3 Langkah: BERHENTI - MENJAUH - CERITA)</strong>.`;
+            if(level === 4) text = `Cerdas Digital! Ingat rumus <strong>T.H.I.N.K.</strong> Pilih <strong>AMAN DILAKUKAN</strong> atau <strong>BAHAYA</strong>!`;
+            if(level === 5) text = `Susun 3 langkah memulihkan kebaikan: <strong>${gameData[state.difficulty].h5.headers.join(', ')}</strong>.`;
+
+            document.getElementById('instr-title').innerText = title; document.getElementById('instr-text').innerHTML = text;
+            document.getElementById('instr-icon').innerHTML = `<i data-lucide="${data.icon}" class="w-12 h-12 text-yellow-600"></i>`;
+            lucide.createIcons(); document.getElementById('modal-instruction').classList.remove('hidden');
+        }
+
+        function closeInstruction() { playSound('click'); document.getElementById('modal-instruction').classList.add('hidden'); }
+        function toggleMenu() { playSound('click'); document.getElementById('modal-menu').classList.toggle('hidden'); lucide.createIcons(); }
+
+        const universalMateri = `
+            <div class="text-center mb-6 border-b-2 border-slate-200 pb-4">
+                <h2 class="text-xl md:text-2xl font-bold text-indigo-800 uppercase">Rangkuman Sekolah Aman</h2>
+                <p class="text-sm text-slate-500 font-medium">Budaya Sekolah Aman dan Nyaman (Permendikdasmen No. 6 Tahun 2026)</p>
+            </div>
+            
+            <div class="mb-6 bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                <h4 class="font-bold text-lg text-indigo-700 mb-3 flex items-center gap-2">🏫 Pesan Utama</h4>
+                <p class="text-sm text-slate-700 leading-relaxed">Sekolah adalah tempat untuk belajar, bermain, berteman, dan tumbuh bersama. <br><br><strong>Di sekolah, aku aman, aku nyaman, aku dihargai, dan aku juga ikut menjaga orang lain.</strong></p>
+            </div>
+
+            <div class="mb-6 bg-indigo-50 p-5 rounded-2xl shadow-sm border border-indigo-200">
+                <h4 class="font-bold text-lg text-indigo-800 mb-3 flex items-center gap-2">🛡️ 4 Fokus Utama BSAN</h4>
+                <p class="text-sm text-indigo-900 mb-4">BSAN mencakup empat hal utama yang harus selalu kita jaga di sekolah:</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-700">
+                    <div class="bg-white p-3 rounded-xl border border-indigo-100 flex items-start gap-3 shadow-sm">
+                        <div class="bg-purple-100 p-2 rounded-full shrink-0 mt-1"><i data-lucide="moon" class="w-5 h-5 text-purple-600"></i></div>
+                        <div>
+                            <div class="font-bold text-slate-700 mb-1">Kebutuhan Spiritual</div>
+                            <div class="text-xs text-slate-500 leading-snug">Aku bebas beribadah sesuai agamaku dan selalu menghormati cara ibadah dan keyakinan teman.</div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-3 rounded-xl border border-indigo-100 flex items-start gap-3 shadow-sm">
+                        <div class="bg-orange-100 p-2 rounded-full shrink-0 mt-1"><i data-lucide="shield" class="w-5 h-5 text-orange-600"></i></div>
+                        <div>
+                            <div class="font-bold text-slate-700 mb-1">Perlindungan Fisik</div>
+                            <div class="text-xs text-slate-500 leading-snug">Tubuhku berharga. Sekolahku bersih, fasilitasnya aman digunakan, dan bebas dari bahaya fisik.</div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-3 rounded-xl border border-indigo-100 flex items-start gap-3 shadow-sm">
+                        <div class="bg-pink-100 p-2 rounded-full shrink-0 mt-1"><i data-lucide="heart" class="w-5 h-5 text-pink-600"></i></div>
+                        <div>
+                            <div class="font-bold text-slate-700 mb-1 leading-tight">Kesejahteraan Psikologis &<br>Keamanan Sosiokultural</div>
+                            <div class="text-xs text-slate-500 mt-1 leading-snug">Perasaanku penting. Tidak ada ejekan atau pengucilan. Semua teman dihargai walau berbeda.</div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-3 rounded-xl border border-indigo-100 flex items-start gap-3 shadow-sm">
+                        <div class="bg-blue-100 p-2 rounded-full shrink-0 mt-1"><i data-lucide="smartphone" class="w-5 h-5 text-blue-600"></i></div>
+                        <div>
+                            <div class="font-bold text-slate-700 mb-1 leading-tight">Keadaban &<br>Keamanan Digital</div>
+                            <div class="text-xs text-slate-500 mt-1 leading-snug">Aku selalu sopan, berhati-hati, dan mematuhi aturan saat menggunakan internet atau HP.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 mb-6 text-center">
+                <h3 class="font-display text-xl text-indigo-700 mb-3">Ingat Rumus A.M.A.N!</h3>
+                <div class="flex flex-wrap justify-center gap-2 text-left">
+                    <div class="bg-white px-3 py-2 rounded-xl shadow-sm border border-indigo-100 text-sm flex items-center gap-2"><span class="text-xl">❤️</span> <span class="font-bold text-indigo-900">Hargai</span></div>
+                    <div class="bg-white px-3 py-2 rounded-xl shadow-sm border border-indigo-100 text-sm flex items-center gap-2"><span class="text-xl">🛡️</span> <span class="font-bold text-indigo-900">Lindungi</span></div>
+                    <div class="bg-white px-3 py-2 rounded-xl shadow-sm border border-indigo-100 text-sm flex items-center gap-2"><span class="text-xl">🤝</span> <span class="font-bold text-indigo-900">Peduli</span></div>
+                    <div class="bg-white px-3 py-2 rounded-xl shadow-sm border border-indigo-100 text-sm flex items-center gap-2"><span class="text-xl">📱</span> <span class="font-bold text-indigo-900">Bijak Digital</span></div>
+                    <div class="bg-white px-3 py-2 rounded-xl shadow-sm border border-indigo-100 text-sm flex items-center gap-2"><span class="text-xl">🗣️</span> <span class="font-bold text-indigo-900">Berani Melapor</span></div>
+                </div>
+            </div>
+
+            <div class="mb-6 bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                <h4 class="font-bold text-lg text-indigo-700 mb-3 flex items-center gap-2">🛑 3 Langkah Saat Tidak Aman</h4>
+                <div class="bg-red-50 p-4 rounded-lg border-l-4 border-red-500 text-sm">
+                    <ul class="list-none space-y-3">
+                        <li>🛑 <strong>BERHENTI:</strong> Katakan "Tolong berhenti. Aku tidak suka."</li>
+                        <li>🚶 <strong>MENJAUH:</strong> Pergi dari tempat yang membuat tidak aman.</li>
+                        <li>🗣️ <strong>CERITA:</strong> Ceritakan kepada guru, orang tua, atau orang dewasa yang dipercaya.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="mb-6 bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                <h4 class="font-bold text-lg text-indigo-700 mb-3 flex items-center gap-2"><i data-lucide="star" class="text-yellow-500"></i> 9 Asas Sekolah Aman</h4>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs md:text-sm text-slate-700">
+                    <div class="p-2 bg-slate-50 rounded border border-slate-100">❤️ Aku menghargai semua orang <strong>(Humanis)</strong></div>
+                    <div class="p-2 bg-slate-50 rounded border border-slate-100">🌱 Aku menjaga diri & lingkungan <strong>(Komprehensif)</strong></div>
+                    <div class="p-2 bg-slate-50 rounded border border-slate-100">🤝 Aku ikut menjaga sekolah <strong>(Partisipatif)</strong></div>
+                    <div class="p-2 bg-slate-50 rounded border border-slate-100">👧 Aku berhak aman & nyaman <strong>(Kepentingan Anak)</strong></div>
+                    <div class="p-2 bg-slate-50 rounded border border-slate-100">🌈 Aku tidak membeda-bedakan <strong>(Nondiskriminatif)</strong></div>
+                    <div class="p-2 bg-slate-50 rounded border border-slate-100">🫶 Semua teman boleh ikut <strong>(Inklusif)</strong></div>
+                    <div class="p-2 bg-slate-50 rounded border border-slate-100">⚖️ Laki-laki & perempuan berharga <strong>(Kesetaraan Gender)</strong></div>
+                    <div class="p-2 bg-slate-50 rounded border border-slate-100">😊 Aku hidup rukun dengan semua <strong>(Harmonis)</strong></div>
+                    <div class="p-2 bg-slate-50 rounded border border-slate-100">🔄 Aku melakukan kebaikan setiap hari <strong>(Berkelanjutan)</strong></div>
+                </div>
+            </div>
+            
+            <div class="mb-6 bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                <h4 class="font-bold text-lg text-indigo-700 mb-3 flex items-center gap-2"><i data-lucide="smartphone" class="text-purple-500"></i> Cerdas Digital (T.H.I.N.K)</h4>
+                <p class="text-sm text-slate-700 mb-2">Sebelum klik / kirim / bagikan, tanyakan:</p>
+                <ul class="text-sm text-slate-700 font-medium space-y-2 bg-purple-50 p-4 rounded-lg border border-purple-100">
+                    <li><span class="text-purple-700 font-bold text-lg">T</span> - Tepatkah?</li>
+                    <li><span class="text-purple-700 font-bold text-lg">H</span> - Hormatkah?</li>
+                    <li><span class="text-purple-700 font-bold text-lg">I</span> - Inikah informasi yang benar?</li>
+                    <li><span class="text-purple-700 font-bold text-lg">N</span> - Nyamankah jika orang lain melihat?</li>
+                    <li><span class="text-purple-700 font-bold text-lg">K</span> - Kuberikan izin atau tidak?</li>
+                </ul>
+            </div>
+        `;
+
+        function showMateri() { playSound('click'); document.getElementById('materi-content-container').innerHTML = universalMateri; document.getElementById('modal-materi').classList.remove('hidden'); lucide.createIcons(); }
+        function closeMateri() { playSound('click'); document.getElementById('modal-materi').classList.add('hidden'); }
+        function menuAction(action) { toggleMenu(); if(action === 'home') location.reload(); else if(action === 'map') { if(state.screen !== 'intro' && state.screen !== 'difficulty') switchScreen('map'); } else if(action === 'materi') showMateri(); }
+
+        function renderMap() {
+            const currentPlayer = state.players[state.activePlayerIdx];
+            document.getElementById('map-status-text').innerText = `Giliran ${currentPlayer.name} masuk ke Halte ${state.currentLevel}...`;
+            for(let i=1; i<=5; i++) {
+                const btn = document.getElementById(`btn-map-${i}`); const bus = document.getElementById(`bus-pos-${i}`);
+                btn.disabled = true; btn.classList.remove('btn-map-active'); bus.classList.add('hidden');
+                
+                if (i < state.currentLevel) {
+                    btn.disabled = false; btn.querySelector('div div').className = "w-14 h-14 md:w-20 md:h-20 bg-green-600 border-4 border-white rounded-full flex flex-col items-center justify-center shadow-xl z-10 relative";
+                } else if (i === state.currentLevel) {
+                    btn.disabled = false; btn.classList.add('btn-map-active'); bus.classList.remove('hidden');
+                }
+            }
+        }
+
+        function getUniqueRandomIndex(max, usedArray) {
+            if (usedArray.length === 0) { for(let i=0; i<max; i++) usedArray.push(i); }
+            const randomIndex = Math.floor(Math.random() * usedArray.length);
+            const val = usedArray[randomIndex]; usedArray.splice(randomIndex, 1); return val;
+        }
+
+        function nextTurn() {
+            const pId = state.players[state.activePlayerIdx].id;
+            state.playerProgress[pId][`h${state.currentLevel}Turns`]++;
+            
+            let allDone = true;
+            state.players.forEach(p => { if((state.playerProgress[p.id][`h${state.currentLevel}Turns`] || 0) < 3) allDone = false; });
+
+            if (allDone) {
+                if (state.currentLevel < 5) {
+                    state.currentLevel++; state.activePlayerIdx = 0; 
+                    showModal(true, "Level Selesai!", "Hebat! Semua tantangan selesai. Halte berikutnya terbuka.", () => { switchScreen('map'); });
+                } else { switchScreen('finish'); }
+            } else {
+                let nextIdx = (state.activePlayerIdx + 1) % state.players.length;
+                let loops = 0;
+                while(loops < state.players.length) {
+                    if((state.playerProgress[state.players[nextIdx].id][`h${state.currentLevel}Turns`] || 0) < 3) { state.activePlayerIdx = nextIdx; break; }
+                    nextIdx = (nextIdx + 1) % state.players.length; loops++;
+                }
+                const nextP = state.players[state.activePlayerIdx];
+                showModal(true, "Ganti Giliran", `Sekarang giliran ${nextP.name}!`, () => { updateHUD(); refreshCurrentLevel(); });
+            }
+        }
+
+        function refreshCurrentLevel() {
+            if(state.currentLevel === 1) loadH1Question(); else if(state.currentLevel === 2) loadH2Card(); else if(state.currentLevel === 3) setupHalte3(); else if(state.currentLevel === 4) loadH4Question(); else if(state.currentLevel === 5) loadH5Problem();
+        }
+
+        // --- HALTE 1 LOGIC (Asas) ---
+        function setupHalte1() { loadH1Question(); }
+        function loadH1Question() {
+            const dataH1 = gameData[state.difficulty].h1;
+            const idx = getUniqueRandomIndex(dataH1.q.length, state.availableH1);
+            state.h1CurrentQ = dataH1.q[idx];
+            
+            document.getElementById('h1-step1').classList.remove('hidden'); document.getElementById('h1-step2').classList.add('hidden');
+            document.getElementById('h1-question-text').innerText = state.h1CurrentQ.q;
+            
+            const asasContainer = document.getElementById('h1-asas-grid'); asasContainer.innerHTML = '';
+            let options = [state.h1CurrentQ.asas];
+            while(options.length < 3) {
+                const r = ASAS_LIST[Math.floor(Math.random() * ASAS_LIST.length)];
+                if(!options.includes(r)) options.push(r);
+            }
+            options.sort(() => Math.random() - 0.5);
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "bg-white border-2 border-slate-300 py-3 md:py-4 rounded-xl font-bold text-slate-700 hover:bg-blue-50 active:scale-95 shadow-sm text-sm md:text-base";
+                btn.innerText = opt; btn.onclick = () => handleH1Step2(opt); asasContainer.appendChild(btn);
+            });
+        }
+        function handleH1Step1(choice) {
+            if(choice === state.h1CurrentQ.key) { playSound('click'); addScore(5); document.getElementById('h1-step1').classList.add('hidden'); document.getElementById('h1-step2').classList.remove('hidden'); } else { showModal(false, "Ops!", "Coba analisis situasinya sekali lagi ya!"); }
+        }
+        function handleH1Step2(choice) {
+            if(choice === state.h1CurrentQ.asas) { addScore(10); showModal(true, "Hebat!", `Ini sesuai dengan: ${choice}`, () => { nextTurn(); }); } else { showModal(false, "Kurang Tepat", `Jawaban yang benar adalah: ${state.h1CurrentQ.asas}`, () => { nextTurn(); }); }
+        }
+
+        // --- HALTE 2 LOGIC (Ruang Aman) ---
+        function setupHalte2() {
+            const cats = gameData[state.difficulty].h2.categories; const grid = document.getElementById('h2-category-grid'); grid.innerHTML = '';
+            cats.forEach(c => {
+                grid.innerHTML += `<button onclick="handleH2Room('${c.id}')" class="btn-game bg-${c.color}-100 border-4 border-${c.color}-400 p-3 md:p-6 rounded-2xl flex flex-col items-center justify-center hover:bg-${c.color}-200 hover:scale-105"><i data-lucide="${c.icon}" class="w-8 h-8 md:w-12 md:h-12 text-${c.color}-600 mb-2"></i><span class="font-bold text-${c.color}-800 text-[10px] md:text-sm leading-tight text-center mt-1">${c.label}</span></button>`;
+            }); lucide.createIcons(); loadH2Card(); 
+        }
+        function loadH2Card() {
+            const dataH2 = gameData[state.difficulty].h2.cards;
+            const idx = getUniqueRandomIndex(dataH2.length, state.availableH2); state.h2CurrentCard = dataH2[idx];
+            document.getElementById('h2-card-text').innerText = state.h2CurrentCard.text;
+            document.getElementById('h2-step1').classList.remove('hidden'); document.getElementById('h2-step2').classList.add('hidden');
+        }
+        function handleH2Room(selectedRoom) {
+            if(selectedRoom === state.h2CurrentCard.cat) { playSound('click'); addScore(5); document.getElementById('h2-step1').classList.add('hidden'); document.getElementById('h2-step2').classList.remove('hidden'); } else { showModal(false, "Kurang Tepat", "Coba pikirkan lagi, situasi ini masuk ke ruang kategori apa?"); }
+        }
+        function handleH2Safety(selectedSafety) {
+            if(selectedSafety === state.h2CurrentCard.type) { addScore(10); showModal(true, "Benar!", "Analisis keamananmu tepat.", () => { nextTurn(); }); } else { showModal(false, "Kurang Tepat", "Coba perhatikan dampak situasi tersebut.", () => { nextTurn(); }); }
+        }
+
+        // --- HALTE 3 LOGIC (3 Langkah) ---
+        function setupHalte3() {
+            const roles = gameData[state.difficulty].h3.roles; const grid = document.getElementById('h3-role-grid'); grid.innerHTML = '';
+            roles.forEach(r => {
+                grid.innerHTML += `<button onclick="startRoleplay('${r.id}')" class="btn-game glass-card p-6 flex flex-col items-center hover:bg-${r.color}-50 transition-transform hover:-translate-y-2 !border-b-8 !border-${r.color}-500"><i data-lucide="${r.icon}" class="w-12 h-12 md:w-16 md:h-16 text-${r.color}-500 mb-4"></i><span class="block text-lg md:text-xl font-bold text-slate-700 text-center">${r.label}</span></button>`;
+            }); lucide.createIcons(); document.getElementById('h3-role-select').classList.remove('hidden'); document.getElementById('h3-gameplay').classList.add('hidden');
+        }
+        function startRoleplay(role) {
+            playSound('click'); document.getElementById('h3-role-select').classList.add('hidden'); document.getElementById('h3-gameplay').classList.remove('hidden');
+            const possibleQs = gameData[state.difficulty].h3.q.filter(d => d.role === role);
+            let validQs = possibleQs.filter(q => !state.usedH3.has(role + "-" + q.problem));
+            if(validQs.length === 0) validQs = possibleQs;
+            state.h3CurrentQ = validQs[Math.floor(Math.random() * validQs.length)];
+            state.usedH3.add(role + "-" + state.h3CurrentQ.problem); document.getElementById('h3-role-badge').innerText = role; loadH3Question();
+        }
+        function loadH3Question() {
+            const q = state.h3CurrentQ; document.getElementById('h3-problem-text').innerText = q.problem;
+            const opts = document.getElementById('h3-options-grid'); opts.innerHTML = '';
+            let choices = [q.solution];
+            while(choices.length < 4) { const d = decoySolutions[Math.floor(Math.random() * decoySolutions.length)]; if(!choices.includes(d)) choices.push(d); }
+            choices.sort(() => Math.random() - 0.5);
+            choices.forEach(c => {
+                const btn = document.createElement('button'); btn.className = "bg-white border-2 border-slate-200 p-4 rounded-xl text-left hover:border-blue-400 font-medium text-slate-700 shadow-sm"; btn.innerText = c;
+                btn.onclick = () => { if(c === q.solution) { addScore(20); showModal(true, "Luar Biasa!", "Tindakanmu mengutamakan peduli dan keselamatan!", () => { nextTurn(); }); } else { playSound('wrong'); showModal(false, "Coba Lagi", "Pikirkan tindakan 3 Langkah: Berhenti - Menjauh - Cerita.", () => { nextTurn(); }); } };
+                opts.appendChild(btn);
+            });
+        }
+
+        // --- HALTE 4 LOGIC (Digital / T.H.I.N.K) ---
+        function setupHalte4() { loadH4Question(); }
+        function loadH4Question() {
+            const dataH4 = gameData[state.difficulty].h4;
+            const idx = getUniqueRandomIndex(dataH4.q.length, state.availableH4); state.h4CurrentQ = dataH4.q[idx];
+            document.getElementById('h4-digital-text').innerText = state.h4CurrentQ.text;
+        }
+        function handleDigitalAction(type) {
+            if(type === state.h4CurrentQ.type) { addScore(15); showModal(true, "Tepat Sekali!", `Itu sesuai dengan prinsip T.H.I.N.K. (Tepat, Hormat, Info benar, Nyaman, Ku beri izin)!`, () => { nextTurn(); }); } else { showModal(false, "Bahaya", "Ingat prinsip T.H.I.N.K. Tindakan ini bisa membahayakan diri sendiri atau orang lain.", () => { nextTurn(); }); }
+        }
+
+        // --- HALTE 5 LOGIC (Ikut Menjaga / Susun Langkah) ---
+        function setupHalte5() {
+            const hdrs = gameData[state.difficulty].h5.headers;
+            document.getElementById('h5-header-k').innerText = hdrs[0]; document.getElementById('h5-header-p').innerText = hdrs[1]; document.getElementById('h5-header-l').innerText = hdrs[2];
+            state.h5Selections = { k: null, p: null, l: null, problemIdx: 0 }; loadH5Problem();
+        }
+        function loadH5Problem() {
+            const dataH5 = gameData[state.difficulty].h5;
+            let availableIdx = []; for(let i=0; i<dataH5.problems.length; i++) { if(!state.usedH5.has(i)) availableIdx.push(i); }
+            if(availableIdx.length === 0) { state.usedH5.clear(); for(let i=0; i<dataH5.problems.length; i++) availableIdx.push(i); }
+            const idx = availableIdx[Math.floor(Math.random() * availableIdx.length)];
+            state.usedH5.add(idx); state.h5Selections.problemIdx = idx; state.h5Selections.k = null; state.h5Selections.p = null; state.h5Selections.l = null;
+            document.getElementById('h5-problem-text').innerText = dataH5.problems[idx]; document.getElementById('h5-counter').innerText = `?`; 
+            
+            populateList('h5-list-korban', dataH5.korban, 'k'); populateList('h5-list-pelaku', dataH5.pelaku, 'p'); populateList('h5-list-lingkungan', dataH5.lingkungan, 'l');
+            ['korban', 'pelaku', 'lingkungan'].forEach(k => {
+                const slot = document.getElementById(`slot-${k}`); slot.innerText = "Pilih tindakan di atas";
+                slot.className = "mt-auto p-3 bg-white/50 border-2 border-dashed border-slate-300 rounded-xl min-h-[50px] flex items-center justify-center text-slate-500 text-xs md:text-sm text-center font-medium transition-colors";
+            });
+        }
+        function populateList(elementId, itemsArray, typeKey) {
+            const container = document.getElementById(elementId); container.innerHTML = '';
+            let items = itemsArray.map((txt, i) => ({ text: txt, idx: i })); items.sort(() => Math.random() - 0.5);
+            items.forEach(item => {
+                const div = document.createElement('div'); div.className = "p-3 bg-white rounded shadow-sm border border-slate-100 cursor-pointer hover:bg-slate-50 text-sm";
+                div.innerText = item.text; div.onclick = () => selectH5Item(typeKey, item.text, item.idx); container.appendChild(div);
+            });
+        }
+        function selectH5Item(typeKey, text, idx) {
+            playSound('click'); state.h5Selections[typeKey] = idx; 
+            let slotId = '', color = '';
+            if(typeKey === 'k') { slotId = 'slot-korban'; color = 'blue'; } if(typeKey === 'p') { slotId = 'slot-pelaku'; color = 'orange'; } if(typeKey === 'l') { slotId = 'slot-lingkungan'; color = 'emerald'; }
+            const slot = document.getElementById(slotId);
+            slot.className = `mt-auto p-3 bg-${color}-100 border-2 border-${color}-500 rounded-xl min-h-[50px] flex items-center justify-center text-${color}-800 font-bold shadow-sm text-xs md:text-sm text-center transition-colors`;
+            slot.innerText = text;
+        }
+        function checkH5Answer() {
+            const { k, p, l, problemIdx } = state.h5Selections;
+            if(k === null || p === null || l === null) { showModal(false, "Belum Lengkap", "Isi semua 3 langkah penyelesaian dulu ya!"); return; }
+            let correctCount = (k === problemIdx ? 1 : 0) + (p === problemIdx ? 1 : 0) + (l === problemIdx ? 1 : 0);
+            let points = correctCount === 1 ? 5 : (correctCount === 2 ? 10 : (correctCount === 3 ? 20 : 0));
+            
+            const dataH5 = gameData[state.difficulty].h5;
+            let msg = `<div class="text-left space-y-2"><p class="font-bold text-center mb-2">Kamu benar ${correctCount} dari 3 langkah!</p>`;
+            msg += `<div class="bg-blue-50 p-2 rounded text-xs"><span class="font-bold text-blue-700">${dataH5.headers[0]}:</span> ${dataH5.korban[problemIdx]}</div>`;
+            msg += `<div class="bg-orange-50 p-2 rounded text-xs"><span class="font-bold text-orange-700">${dataH5.headers[1]}:</span> ${dataH5.pelaku[problemIdx]}</div>`;
+            msg += `<div class="bg-green-50 p-2 rounded text-xs"><span class="font-bold text-emerald-700">${dataH5.headers[2]}:</span> ${dataH5.lingkungan[problemIdx]}</div></div>`;
+
+            if (points > 0) { addScore(points); showModal(true, "Poin", msg, () => { nextTurn(); }); } else { showModal(false, "Kurang Tepat", msg, () => { nextTurn(); }); }
+        }
+
+        // --- FINISH ---
+        function renderFinish() {
+            stageText.innerText = "SELESAI"; playSound('win');
+            const sortedPlayers = [...state.players].sort((a, b) => b.score - a.score); const winner = sortedPlayers[0];
+            document.getElementById('winner-name').innerText = winner.name;
+            const lbContainer = document.getElementById('leaderboard'); lbContainer.innerHTML = '';
+            sortedPlayers.forEach((p, idx) => {
+                const row = document.createElement('div'); row.className = "flex items-center justify-between bg-white p-4 rounded-xl shadow-md border-l-8 " + (idx === 0 ? "border-yellow-400" : "border-slate-300");
+                row.innerHTML = `
+                    <div class="flex items-center gap-4">
+                        <div class="font-bold text-xl md:text-2xl w-8 text-center text-slate-400">#${idx + 1}</div>
+                        <img src="${p.avatar.img}" class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-slate-100 object-cover">
+                        <div class="font-bold text-base md:text-lg text-slate-800">${p.name} ${idx===0 ? '👑' : ''}</div>
+                    </div>
+                    <div class="font-display text-xl md:text-2xl text-indigo-600">${p.score}</div>
+                `;
+                lbContainer.appendChild(row);
+            });
+        }
+    </script>
+</body>
+</html>
